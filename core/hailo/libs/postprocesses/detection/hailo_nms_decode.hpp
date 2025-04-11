@@ -12,7 +12,7 @@
 #include "common/nms.hpp"
 #include "common/labels/coco_ninety.hpp"
 #include "common/labels/coco_visdrone.hpp"
-
+#include "common/labels/nv_imx.hpp"
 static const int DEFAULT_MAX_BOXES = 100;
 static const float DEFAULT_THRESHOLD = 0.4;
 
