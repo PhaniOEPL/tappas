@@ -7,21 +7,17 @@
 namespace common
 {
     static std::map<uint8_t, std::string> nv_imx = {
-        {0, "unlabeled"},
-        {1, "persons"},
-        {2, "cars"},
-        {3, "bikesandbicycles"},
-        {4, "vehicles"},
-        {5, "tanks"},
-        {6, "ships"},
-        {7, "boatsandstreams"},
-        {8, "birds"},
-        {9, "monkeys"},
-        {10, "animals"},
-        {11, "drones"},
-        {12, "flights"},
-        {13, "fighterflights"},
-        {14, "helicopters"},
-        {15, "riflesandguns"},
-        {16, "baggages"}};
+        {0, "person"},
+        {1, "cars"},
+        {2, "vehicles"},
+        {3, "tanks"},
+        {4, "ships"},
+        {5, "boatsandstreams"},
+        {6, "birds"},
+        {7, "monkeys"},
+        {8, "animals"},
+        {9, "drones"},
+        {10, "flights"},
+        {11, "fighterflights"},
+        {12, "helicopters"}};
 }
