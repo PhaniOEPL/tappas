@@ -171,13 +171,13 @@ public:
        		if (g_yolo_shmid == -1) 
         	{
        		     
-		     fprintf("shmget error: %s\n", strerror(errno));
+		     fprintf(stderr, "shmget error: %s\n", strerror(errno));
 		     perror("yolo post process:nms | Shared memory create error\n");
         	} 	   
         	g_yolo_shmp = (yolo_shmseg*)shmat(g_yolo_shmid, NULL, 0);//Attach to the segment to get a pointer to it.
        		if (g_yolo_shmp == (void *) -1) 
         	{
-        	    	perror("shmget error: %s\n", strerror(errno));
+        	    	//perror("shmget error: %s\n", strerror(errno));
 			perror("yolo post process:nms | Shared memory attach error\n");
         	}
 		g_bShmInitialized=true;
