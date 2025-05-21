@@ -22,7 +22,7 @@
 #include<errno.h>
 #include<stdlib.h>
 
-static const int DEFAULT_MAX_BOXES = 100;
+static const int DEFAULT_MAX_BOXES = 50;
 static const float DEFAULT_THRESHOLD = 0.4;
 
 struct ObjectDetectionResultsType  //nv-imx
