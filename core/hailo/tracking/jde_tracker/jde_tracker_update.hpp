@@ -395,7 +395,7 @@ inline std::vector<STrack> JDETracker::update(std::vector<HailoDetectionPtr> &in
     for (uint i = 0; i < unmatched_detections.size(); i++)
         new_stracks.emplace_back(detections[unmatched_detections[i]]);
 
-    update_trackmode(activated_stracks,lost_stracks,new_stracks);
+    //update_trackmode(activated_stracks,lost_stracks,new_stracks);
     //******************************************************************
     // Step 6: Update Database
     //******************************************************************
