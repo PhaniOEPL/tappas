@@ -13,8 +13,46 @@
 #include "common/labels/coco_ninety.hpp"
 #include "common/labels/coco_visdrone.hpp"
 #include "common/labels/nv_imx.hpp"
+
+//shared mem include
+#include<stdio.h>
+#include<sys/ipc.h>
+#include<sys/shm.h>
+#include<sys/types.h>
+#include<errno.h>
+#include<stdlib.h>
+
 static const int DEFAULT_MAX_BOXES = 100;
 static const float DEFAULT_THRESHOLD = 0.4;
+
+struct ObjectDetectionResultsType  //nv-imx
+{
+   int tlx;
+   int tly;
+   int width;
+   int height;
+   int classID;
+};
+
+#define YOLO_SHM_KEY 0x1222
+struct yolo_shmseg 
+{
+    ObjectDetectionResultsType _detections[DEFAULT_MAX_BOXES];
+    unsigned int _numObjects=0;
+    float detectThresh_H=0.4;
+    float detectThresh_M=0.2;
+    float detectThresh_L=0.1;
+    unsigned int rectAreaThresh_M =256;
+    unsigned int rectAreaThresh_S =100;
+    unsigned int model_input_size_x=640;
+    unsigned int model_input_size_y=640; 
+};
+
+static int g_yolo_shmid=-1;
+static struct yolo_shmseg *g_yolo_shmp=nullptr;
+struct yolo_shmseg g_yolo_shm;
+static bool g_bShmInitialized=false;
+static int g_objCounter=0;
 
 class HailoNMSDecode
 {
@@ -43,14 +81,68 @@ private:
     {
         float confidence = CLAMP(dequant_bbox.score, 0.0f, 1.0f);
         // filter score by detection threshold if needed.
-        if (!_filter_by_score || dequant_bbox.score > _detection_thr)
-        {
-            float32_t w, h = 0.0f;
-            // parse width and height of the box
-            std::tie(w, h) = get_shape(&dequant_bbox);
-            // create new detection object and add it to the vector of detections
-            _objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min, w, h), class_index, labels_dict[class_index], confidence));
-        }
+        // if (!_filter_by_score || dequant_bbox.score > _detection_thr)
+        // {
+        //     float32_t w, h = 0.0f;
+        //     // parse width and height of the box
+        //     std::tie(w, h) = get_shape(&dequant_bbox);
+        //     // create new detection object and add it to the vector of detections
+        //     _objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min, w, h), class_index, labels_dict[class_index], confidence));
+        // }
+    float32_t w, h = 0.0f;        
+		std::tie(w, h) = get_shape(&dequant_bbox); // parse width and height of the box   
+		unsigned int area=(unsigned int)(g_yolo_shm.model_input_size_x*g_yolo_shm.model_input_size_y*w*h);
+
+		if(area <= g_yolo_shm.rectAreaThresh_S)	// Smallest detection
+		{
+			if(confidence  >= g_yolo_shm.detectThresh_L)
+			{
+				if(_objects.size() < DEFAULT_MAX_BOXES)
+				{
+                		_objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min, w, h), class_index, labels_dict[class_index], confidence));
+				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shm.model_input_size_x);
+				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shm.model_input_size_y);
+				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shm.model_input_size_x);
+				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shm.model_input_size_y);
+				g_yolo_shmp->_detections[g_objCounter].classID= (int)(class_index);
+				g_objCounter++;
+				}
+			}
+		}
+		else if( area <= g_yolo_shm.rectAreaThresh_M )	// Medium size detection
+		{
+			if(confidence  >= g_yolo_shm.detectThresh_M)
+ 			{
+				if(_objects.size() < DEFAULT_MAX_BOXES)
+				{
+                		_objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min, w, h), class_index, labels_dict[class_index], confidence));
+				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shm.model_input_size_x);
+				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shm.model_input_size_y);
+				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shm.model_input_size_x);
+				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shm.model_input_size_y);
+				g_yolo_shmp->_detections[g_objCounter].classID= (int)(class_index);
+				g_objCounter++;
+				}
+			}
+		}
+		else
+		{
+			if(confidence  >= g_yolo_shm.detectThresh_H)
+			{
+				if(_objects.size() < DEFAULT_MAX_BOXES)
+				{
+                		_objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min, w, h), class_index, labels_dict[class_index], confidence));
+				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shm.model_input_size_x);
+				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shm.model_input_size_y);
+				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shm.model_input_size_x);
+				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shm.model_input_size_y);
+				g_yolo_shmp->_detections[g_objCounter].classID= (int)(class_index);
+				g_objCounter++;
+				}
+			}
+		}
+		g_yolo_shmp->_numObjects=g_objCounter;
+    
     }
 
     std::pair<float, float> get_shape(auto *bbox_struct)
@@ -67,6 +159,29 @@ public:
         // making sure that the network's output is indeed an NMS type, by checking the order type value included in the metadata
         if (HAILO_FORMAT_ORDER_HAILO_NMS != _vstream_info.format.order)
             throw std::invalid_argument("Output tensor " + _nms_output_tensor->name() + " is not an NMS type");
+
+        if(g_bShmInitialized==false)
+	{
+		printf("nv-imx: 1.4.2\n");
+		//Shared memory yolo postprocess
+        	g_yolo_shmid = shmget(YOLO_SHM_KEY, sizeof(struct yolo_shmseg), 0644|IPC_CREAT); //create shared memory
+       		if (g_yolo_shmid == -1) 
+        	{
+       		     perror("yolo post process:nms | Shared memory create error\n");
+        	} 	   
+        	g_yolo_shmp = (yolo_shmseg*)shmat(g_yolo_shmid, NULL, 0);//Attach to the segment to get a pointer to it.
+       		if (g_yolo_shmp == (void *) -1) 
+        	{
+        	    perror("yolo post process:nms | Shared memory attach error\n");
+        	}
+		g_bShmInitialized=true;
+		printf("Pos process SHM attached\n");
+	}
+	
+	g_objCounter=0;
+	//copy shared memory data locally
+	memcpy(&g_yolo_shm, g_yolo_shmp,sizeof(struct yolo_shmseg));
+        
     };
 
     template <typename T, typename BBoxType>
