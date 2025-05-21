@@ -239,22 +239,23 @@ void yolov5_no_persons(HailoROIPtr roi)
 }
 void filter(HailoROIPtr roi, void *params_void_ptr)
 {
-    if (!roi->has_tensors())
-    {
-        return;
-    }
-    YoloParamsNMS *params = reinterpret_cast<YoloParamsNMS *>(params_void_ptr);
-    std::vector<HailoTensorPtr> tensors = roi->get_tensors();
-    // find the nms tensor
-    for (auto tensor : tensors)
-    {
-        if (std::regex_search(tensor->name(), std::regex("nms_postprocess"))) 
-        {
-            auto post = HailoNMSDecode(tensor, params->labels, params->detection_threshold, params->max_boxes, params->filter_by_score);
-            auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
-            hailo_common::add_detections(roi, detections);
-        }
-    }
+    // if (!roi->has_tensors())
+    // {
+    //     return;
+    // }
+    // YoloParamsNMS *params = reinterpret_cast<YoloParamsNMS *>(params_void_ptr);
+    // std::vector<HailoTensorPtr> tensors = roi->get_tensors();
+    // // find the nms tensor
+    // for (auto tensor : tensors)
+    // {
+    //     if (std::regex_search(tensor->name(), std::regex("nms_postprocess"))) 
+    //     {
+    //         auto post = HailoNMSDecode(tensor, params->labels, params->detection_threshold, params->max_boxes, params->filter_by_score);
+    //         auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
+    //         hailo_common::add_detections(roi, detections);
+    //     }
+    // }
+    yolov8m(roi);
 }
 void filter_letterbox(HailoROIPtr roi, void *params_void_ptr)
 {
