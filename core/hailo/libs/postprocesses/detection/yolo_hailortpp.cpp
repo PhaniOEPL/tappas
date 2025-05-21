@@ -33,7 +33,7 @@ YoloParamsNMS *init(const std::string config_path, const std::string function_na
     YoloParamsNMS *params;
     if (!fs::exists(config_path))
     {
-        params = new YoloParamsNMS(common::coco_eighty);
+        params = new YoloParamsNMS(common::nv_imx);
         return params;
     }
     else
