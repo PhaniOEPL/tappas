@@ -34,7 +34,7 @@ struct ObjectDetectionResultsType  //nv-imx
    int classID;
 };
 
-#define YOLO_SHM_KEY 0x1222
+#define YOLO_SHM_KEY 0x1322
 struct yolo_shmseg 
 {
     ObjectDetectionResultsType _detections[DEFAULT_MAX_BOXES];
@@ -163,13 +163,15 @@ public:
         if(g_bShmInitialized==false)
 	{
 		printf("nv-imx: 1.4.2\n");
-		printf("sizeof(struct yolo_shmseg) = %zu\n", sizeof(struct yolo_shmseg));
+		size_t size = sizeof(struct yolo_shmseg);
+		printf("Size of struct = %lu\n", size);
+		//printf("sizeof(struct yolo_shmseg) = %zu\n", sizeof(struct yolo_shmseg));
 		//Shared memory yolo postprocess
         	g_yolo_shmid = shmget(YOLO_SHM_KEY, sizeof(struct yolo_shmseg), 0644|IPC_CREAT); //create shared memory
        		if (g_yolo_shmid == -1) 
         	{
        		     
-		     perror("shmget error: %s\n", strerror(errno));
+		     fprintf("shmget error: %s\n", strerror(errno));
 		     perror("yolo post process:nms | Shared memory create error\n");
         	} 	   
         	g_yolo_shmp = (yolo_shmseg*)shmat(g_yolo_shmid, NULL, 0);//Attach to the segment to get a pointer to it.
