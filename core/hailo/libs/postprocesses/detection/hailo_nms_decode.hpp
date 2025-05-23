@@ -142,11 +142,11 @@ private:
 			}
 		}
 		g_yolo_shmp->_numObjects=g_objCounter;
-	    fprintf("hailo detection x : %d", g_yolo_shmp->_detections[g_objCounter].tlx);
-	    fprintf("hailo detection x : %d", g_yolo_shmp->_detections[g_objCounter].tly);
-	    fprintf("hailo detection width : %d", g_yolo_shmp->_detections[g_objCounter].width);
-	    fprintf("hailo detection height : %d", g_yolo_shmp->_detections[g_objCounter].height);
-	    fprintf("hailo detection classID : %d", g_yolo_shmp->_detections[g_objCounter].classID);
+	    printf("hailo detection x : %d", g_yolo_shmp->_detections[g_objCounter].tlx);
+	    printf("hailo detection x : %d", g_yolo_shmp->_detections[g_objCounter].tly);
+	    sprintf("hailo detection width : %d", g_yolo_shmp->_detections[g_objCounter].width);
+	    sprintf("hailo detection height : %d", g_yolo_shmp->_detections[g_objCounter].height);
+	    printf("hailo detection classID : %d", g_yolo_shmp->_detections[g_objCounter].classID);
 
     }
 
