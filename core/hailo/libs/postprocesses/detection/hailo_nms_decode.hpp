@@ -142,7 +142,12 @@ private:
 			}
 		}
 		g_yolo_shmp->_numObjects=g_objCounter;
-    
+	    fprintf("hailo detection x : %d", g_yolo_shmp->_detections[g_objCounter].tlx);
+	    fprintf("hailo detection x : %d", g_yolo_shmp->_detections[g_objCounter].tly);
+	    fprintf("hailo detection width : %d", g_yolo_shmp->_detections[g_objCounter].width);
+	    fprintf("hailo detection height : %d", g_yolo_shmp->_detections[g_objCounter].height);
+	    fprintf("hailo detection classID : %d", g_yolo_shmp->_detections[g_objCounter].classID);
+
     }
 
     std::pair<float, float> get_shape(auto *bbox_struct)
