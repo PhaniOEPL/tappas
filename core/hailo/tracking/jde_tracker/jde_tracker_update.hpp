@@ -418,7 +418,7 @@ inline std::vector<STrack> JDETracker::update(std::vector<HailoDetectionPtr> &in
         for (uint i = 0; i < this->m_new_stracks.size(); i++)
             output_stracks.emplace_back(this->m_new_stracks[i]);
     }
-    report_lost = true;
+    // report_lost = true;
     if (report_lost or this->m_debug)
     {
         for (uint i = 0; i < this->m_lost_stracks.size(); i++)
@@ -440,12 +440,12 @@ inline std::vector<STrack> JDETracker::update(std::vector<HailoDetectionPtr> &in
 		m_track_shmp->_tracks[i].height    = xyah[3]*m_track_shmp->_model_input_size_y; //h
         	m_track_shmp->_tracks[i].trackID   = temp_track.m_track_id;
 		m_track_shmp->_tracks[i].classtype = temp_track.m_class_id;
-		printf("Hailo: Tracks x: %d\n",m_track_shmp->_tracks[i].cX);
-		printf("Hailo: Tracks y: %d\n",m_track_shmp->_tracks[i].cY);
-		printf("Hailo: Tracks width: %d\n",m_track_shmp->_tracks[i].width);
-		printf("Hailo: Tracks height: %d\n",m_track_shmp->_tracks[i].height);
-		printf("Hailo: Tracks track id: %d\n",m_track_shmp->_tracks[i].trackID);
-		printf("Hailo: Tracks classtype: %d\n",m_track_shmp->_tracks[i].classType);
+		// printf("Hailo: Tracks x: %d\n",m_track_shmp->_tracks[i].cX);
+		// printf("Hailo: Tracks y: %d\n",m_track_shmp->_tracks[i].cY);
+		// printf("Hailo: Tracks width: %d\n",m_track_shmp->_tracks[i].width);
+		// printf("Hailo: Tracks height: %d\n",m_track_shmp->_tracks[i].height);
+		// printf("Hailo: Tracks track id: %d\n",m_track_shmp->_tracks[i].trackID);
+		// printf("Hailo: Tracks classtype: %d\n",m_track_shmp->_tracks[i].classType);
 		
 	}		
      }
