@@ -286,9 +286,9 @@ void filter_letterbox(HailoROIPtr roi, void *params_void_ptr)
     {
         auto detection_bbox = detection->get_bbox();
         auto xmin = detection_bbox.xmin();
-        auto ymin = detection_bbox.ymin();
+        auto ymin = detection_bbox.ymin()*512/640;
         auto xmax = detection_bbox.xmax();
-        auto ymax = detection_bbox.ymax();
+        auto ymax = detection_bbox.ymax()*512/640;
 
         HailoBBox new_bbox(xmin, ymin, xmax - xmin, ymax - ymin);
         detection->set_bbox(new_bbox);
