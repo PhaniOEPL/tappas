@@ -34,7 +34,13 @@ YoloParamsNMS *init(const std::string config_path, const std::string function_na
     YoloParamsNMS *params;
     if (!fs::exists(config_path))
     {
-        params = new YoloParamsNMS(common::nv_imx);
+        printf("%s\n", function_name);
+        if (function_name == DEFAULT_YOLOV5M_OUTPUT_LAYER){
+        params = new YoloParamsNMS(common::nv_imx5);
+        }
+        else {
+            params = new YoloParamsNMS(common::nv_imx);
+        }
         return params;
     }
     else
@@ -275,7 +281,18 @@ void filter_letterbox(HailoROIPtr roi, void *params_void_ptr)
     //     HailoBBox new_bbox(xmin, ymin, xmax - xmin, ymax - ymin);
     //     detection->set_bbox(new_bbox);
     // }
+ auto detections = hailo_common::get_hailo_detections(roi);
+    for (auto &detection : detections)
+    {
+        auto detection_bbox = detection->get_bbox();
+        auto xmin = detection_bbox.xmin();
+        auto ymin = detection_bbox.ymin();
+        auto xmax = detection_bbox.xmax();
+        auto ymax = detection_bbox.ymax();
 
+        HailoBBox new_bbox(xmin, ymin, xmax - xmin, ymax - ymin);
+        detection->set_bbox(new_bbox);
+    }
     // // Clear the scaling bbox of main roi because all detections are fixed.
     // roi->clear_scaling_bbox();
 
