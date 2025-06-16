@@ -13,7 +13,7 @@
 #include "common/labels/coco_ninety.hpp"
 #include "common/labels/coco_visdrone.hpp"
 #include "common/labels/nv_imx.hpp"
-
+#include "common/labels/nv_imx5.hpp"
 //shared mem include
 #include<stdio.h>
 #include<sys/ipc.h>
