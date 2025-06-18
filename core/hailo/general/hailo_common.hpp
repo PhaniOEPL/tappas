@@ -228,8 +228,8 @@ namespace hailo_common
     inline HailoBBox create_flattened_bbox(const HailoBBox &bbox, const HailoBBox &parent_bbox)
     {
         float xmin = parent_bbox.xmin() + bbox.xmin() * parent_bbox.width();
-        //float ymin = parent_bbox.ymin() + bbox.ymin() * parent_bbox.height();
-        float ymin = bbox.ymin() * parent_bbox.height();
+        float ymin = parent_bbox.ymin() + bbox.ymin() * parent_bbox.height();
+        //float ymin = bbox.ymin() * parent_bbox.height();
 
         float width = bbox.width() * parent_bbox.width();
         float height = bbox.height() * parent_bbox.height();
