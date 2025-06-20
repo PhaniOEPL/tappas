@@ -103,7 +103,7 @@ private:
 				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shm.model_input_size_x);
 				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*512);
 				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shm.model_input_size_x);
-				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shm.model_input_size_y);
+				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*640);
 				g_yolo_shmp->_detections[g_objCounter].classID= (int)(class_index);
 				g_objCounter++;
 				}
@@ -119,7 +119,7 @@ private:
 				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shm.model_input_size_x);
 				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*512);
 				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shm.model_input_size_x);
-				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shm.model_input_size_y);
+				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*640);
 				g_yolo_shmp->_detections[g_objCounter].classID= (int)(class_index);
 				g_objCounter++;
 				}
@@ -135,7 +135,7 @@ private:
 				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shm.model_input_size_x);
 				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*512);
 				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shm.model_input_size_x);
-				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shm.model_input_size_y);
+				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*640);
 				g_yolo_shmp->_detections[g_objCounter].classID= (int)(class_index);
 				g_objCounter++;
 				}
