@@ -45,7 +45,7 @@ struct yolo_shmseg
     unsigned int rectAreaThresh_M =256;
     unsigned int rectAreaThresh_S =100;
     unsigned int model_input_size_x=640;
-    unsigned int model_input_size_y=640; 
+    unsigned int model_input_size_y=512; 
 };
 
 static int g_yolo_shmid=-1;
