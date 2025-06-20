@@ -176,17 +176,17 @@ void yolov8m(HailoROIPtr roi)
 {
     auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8M_OUTPUT_LAYER), common::nv_imx);
     auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
-       for (auto &detection : detections)
-    {
-        auto detection_bbox = detection->get_bbox();
-        auto xmin = detection_bbox.xmin();
-        auto ymin = detection_bbox.ymin()*512/640;
-        auto xmax = detection_bbox.xmax();
-        auto ymax = detection_bbox.ymax()*512/640;
+    //    for (auto &detection : detections)
+    // {
+    //     auto detection_bbox = detection->get_bbox();
+    //     auto xmin = detection_bbox.xmin();
+    //     auto ymin = detection_bbox.ymin()*512/640;
+    //     auto xmax = detection_bbox.xmax();
+    //     auto ymax = detection_bbox.ymax()*512/640;
 
-        HailoBBox new_bbox(xmin, ymin, xmax - xmin, ymax - ymin);
-        detection->set_bbox(new_bbox);
-    }
+    //     HailoBBox new_bbox(xmin, ymin, xmax - xmin, ymax - ymin);
+    //     detection->set_bbox(new_bbox);
+    // }
     hailo_common::add_detections(roi, detections);
 }
 
