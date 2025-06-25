@@ -16,7 +16,7 @@
 #include "common/labels/nv_imx5.hpp"
 
 static const std::string DEFAULT_YOLOV5S_OUTPUT_LAYER = "yolov5s_nv12/yolov5_nms_postprocess";
-static const std::string DEFAULT_YOLOV5M_OUTPUT_LAYER = "yolov5/yolov5_nms_postprocess";
+static const std::string DEFAULT_YOLOV5M_OUTPUT_LAYER = "yolov5_nms_postprocess";
 static const std::string DEFAULT_YOLOV5M_VEHICLES_OUTPUT_LAYER = "yolov5m_vehicles/yolov5_nms_postprocess";
 static const std::string DEFAULT_YOLOV8S_OUTPUT_LAYER = "yolov8s/yolov8_nms_postprocess";
 static const std::string DEFAULT_YOLOV8M_OUTPUT_LAYER = "yolov8m/yolov8_nms_postprocess";
@@ -131,7 +131,7 @@ static std::map<uint8_t, std::string> yolo_vehicles_labels = {
 void yolov5(HailoROIPtr roi)
 {
 
-    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV5M_8M_OUTPUT_LAYER ), common::nv_imx5);
+    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV5M_OUTPUT_LAYER ), common::nv_imx5);
     auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
     hailo_common::add_detections(roi, detections);
 }
@@ -175,7 +175,7 @@ void yolov8s(HailoROIPtr roi)
 
 void yolov8m(HailoROIPtr roi)
 {
-    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV5M_8M_OUTPUT_LAYER), common::nv_imx);
+    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8M_OUTPUT_LAYER), common::nv_imx);
     auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
     //    for (auto &detection : detections)
     // {
