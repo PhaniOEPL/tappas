@@ -101,9 +101,9 @@ private:
 				{
                 		_objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min, w, h), class_index, labels_dict[class_index], confidence));
 				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shm.model_input_size_x);
-				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shm.model_input_size_y/512);
+				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shm.model_input_size_y*640/512);
 				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shm.model_input_size_x);
-				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shm.model_input_size_y/512);
+				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shm.model_input_size_y*640/512);
 				g_yolo_shmp->_detections[g_objCounter].classID= (int)(class_index);
 				g_objCounter++;
 				}
@@ -117,9 +117,9 @@ private:
 				{
                 		_objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min, w, h), class_index, labels_dict[class_index], confidence));
 				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shm.model_input_size_x);
-				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shm.model_input_size_y/512);
+				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shm.model_input_size_y*640/512);
 				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shm.model_input_size_x);
-				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shm.model_input_size_y/512);
+				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shm.model_input_size_y*640/512);
 				g_yolo_shmp->_detections[g_objCounter].classID= (int)(class_index);
 				g_objCounter++;
 				}
@@ -133,9 +133,9 @@ private:
 				{
                 		_objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min, w, h), class_index, labels_dict[class_index], confidence));
 				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shm.model_input_size_x);
-				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shm.model_input_size_y/512);
+				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shm.model_input_size_y*640/512);
 				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shm.model_input_size_x);
-				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shm.model_input_size_y/512);
+				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shm.model_input_size_y*640/512);
 				g_yolo_shmp->_detections[g_objCounter].classID= (int)(class_index);
 				g_objCounter++;
 				}
