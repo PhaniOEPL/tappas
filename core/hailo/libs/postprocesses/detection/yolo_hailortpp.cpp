@@ -14,7 +14,7 @@
 #include "yolo_hailortpp.hpp"
 #include "common/labels/nv_imx.hpp"
 #include "common/labels/nv_imx5.hpp"
-
+#include "common/labels/nv_imxDrone.hpp"
 static const std::string DEFAULT_YOLOV5S_OUTPUT_LAYER = "yolov5s_nv12/yolov5_nms_postprocess";
 static const std::string DEFAULT_YOLOV5M_OUTPUT_LAYER = "yolov5_nms_postprocess";
 static const std::string DEFAULT_YOLOV5M_VEHICLES_OUTPUT_LAYER = "yolov5m_vehicles/yolov5_nms_postprocess";
