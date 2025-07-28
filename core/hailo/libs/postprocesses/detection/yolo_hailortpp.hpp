@@ -11,6 +11,7 @@ __BEGIN_DECLS
 void filter(HailoROIPtr roi);
 void yolov5(HailoROIPtr roi);
 void yolox(HailoROIPtr roi);
+void yolov8(HailoROIPtr roi);
 void yolov5_no_persons(HailoROIPtr roi);
 void yolov5m_vehicles(HailoROIPtr roi);
 __END_DECLS
