@@ -2,6 +2,7 @@
 #include "yolo_hailortpp.hpp"
 #include "common/labels/coco_eighty.hpp"
 #include "common/labels/nv_imx.hpp"
+#include "common/labels/nv_imx5.hpp"
 
 
 static const std::string DEFAULT_YOLOV5M_OUTPUT_LAYER = "yolov5_nms_postprocess";
@@ -13,7 +14,7 @@ static std::map<uint8_t, std::string> yolo_vehicles_labels = {
 
 void yolov5(HailoROIPtr roi)
 {
-    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV5M_OUTPUT_LAYER), common::nv_imx);
+    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV5M_OUTPUT_LAYER), common::nv_imx5);
     auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
     hailo_common::add_detections(roi, detections);
 }
