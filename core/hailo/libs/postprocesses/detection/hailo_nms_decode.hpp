@@ -13,7 +13,7 @@
 #include "common/labels/coco_ninety.hpp"
 #include "common/labels/coco_visdrone.hpp"
 #include "common/labels/nv_imx.hpp"
-#include "commom/labels/nv_imx5.hpp"
+#include "common/labels/nv_imx5.hpp"
 //shared mem include
 #include<stdio.h>
 #include<sys/ipc.h>
@@ -101,7 +101,7 @@ private:
 			{
 				if(_objects.size() < DEFAULT_MAX_BOXES)
 				{
-                		_objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min*640/512, w, h*640/512), class_index, labels_dict[class_index], confidence));
+                		_objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min, w, h), class_index, labels_dict[class_index], confidence));
 				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shm.model_input_size_x);
 				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shm.model_input_size_y);
 				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shm.model_input_size_x);
@@ -117,7 +117,7 @@ private:
  			{
 				if(_objects.size() < DEFAULT_MAX_BOXES)
 				{
-                		_objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min*640/512, w, h*640/512), class_index, labels_dict[class_index], confidence));
+                		_objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min, w, h), class_index, labels_dict[class_index], confidence));
 				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shm.model_input_size_x);
 				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shm.model_input_size_y);
 				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shm.model_input_size_x);
@@ -133,7 +133,7 @@ private:
 			{
 				if(_objects.size() < DEFAULT_MAX_BOXES)
 				{
-                		_objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min*640/512, w, h*640/512), class_index, labels_dict[class_index], confidence));
+                		_objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min, w, h), class_index, labels_dict[class_index], confidence));
 				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shm.model_input_size_x);
 				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shm.model_input_size_y);
 				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shm.model_input_size_x);
