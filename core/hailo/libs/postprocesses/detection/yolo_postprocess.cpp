@@ -10,8 +10,7 @@
 
 #include "yolo_postprocess.hpp"
 #include "common/nms.hpp"
-#include "common/nv_imx.hpp"
-#include "common/nv_imx5.hpp"
+
 #include "json_config.hpp"
 
 #include "rapidjson/document.h"
