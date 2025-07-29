@@ -10,6 +10,8 @@
 
 #include "yolo_postprocess.hpp"
 #include "common/nms.hpp"
+#include "common/nv_imx.hpp"
+#include "common/nv_imx5.hpp"
 #include "json_config.hpp"
 
 #include "rapidjson/document.h"
@@ -139,6 +141,37 @@ public:
     };
 
     virtual ~Yolov5() = default;
+
+private:
+    std::vector<HailoTensorPtr> _tensors;
+};
+
+class Yolov8 : public YoloPost
+{
+public:
+    Yolov8(HailoROIPtr roi, YoloParams *params)
+        : YoloPost(params->labels, params->detection_threshold, params->iou_threshold, params->max_boxes), _tensors(roi->get_tensors())
+    {
+        if (_tensors.size() > 0)
+        {
+            bool sigmoid = (params->output_activation == "sigmoid");
+            sort(_tensors.begin(), _tensors.end(),
+                 [](const HailoTensorPtr &a, const HailoTensorPtr &b)
+                 { return a->size() < b->size(); });
+
+            m_image_width = _tensors[0]->width() * 32;
+            m_image_height = _tensors[0]->height() * 32;
+            _layers.reserve(_tensors.size());
+            for (std::size_t i = 0; i < _tensors.size(); i++)
+            {
+                hailo_format_type_t format = _tensors[i]->vstream_info().format.type;
+                _layers.push_back(std::make_shared<Yolov5OL>(_tensors[i], params->anchors_vec[i], sigmoid, params->label_offset, format == HAILO_FORMAT_TYPE_UINT16));
+            }
+        }
+        params->check_params_logic(get_num_classes());
+    };
+
+    virtual ~Yolov8() = default;
 
 private:
     std::vector<HailoTensorPtr> _tensors;
@@ -430,7 +463,7 @@ void yolox(HailoROIPtr roi, void *params_void_ptr)
 void filter(HailoROIPtr roi, void *params_void_ptr)
 {
     YoloParams *params = reinterpret_cast<YoloParams *>(params_void_ptr);
-    yolov5(roi, params);
+    yolov8(roi, params);
 }
 
 YoloParams *init(const std::string config_path, const std::string function_name)
