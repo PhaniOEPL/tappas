@@ -72,6 +72,7 @@ YoloParams *init(std::string config_path, std::string func_name);
 void free_resources(void *params_void_ptr);
 void filter(HailoROIPtr roi, void *params_void_ptr);
 void yolov5(HailoROIPtr roi, void *params_void_ptr);
+void yolov8(HailoROIPtr roi, void *params_void_ptr);
 void yolox(HailoROIPtr roi, void *params_void_ptr);
 void yoloxx(HailoROIPtr roi, void *params_void_ptr);
 void yolov3(HailoROIPtr roi, void *params_void_ptr);
