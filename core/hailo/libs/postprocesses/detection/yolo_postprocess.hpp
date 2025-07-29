@@ -7,7 +7,8 @@
 #include "hailo_common.hpp"
 #include "yolo_output.hpp"
 #include "common/labels/coco_eighty.hpp"
-
+#include "common/labels/nv_imx5.hpp"
+#include "common/labels/nv_imx.hpp"
 __BEGIN_DECLS
 
 class YoloParams
