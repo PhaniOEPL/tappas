@@ -427,6 +427,15 @@ void yolov5(HailoROIPtr roi, void *params_void_ptr)
     hailo_common::add_detections(roi, detections);
 }
 
+
+void yolov8(HailoROIPtr roi, void *params_void_ptr)
+{
+    YoloParams *params = reinterpret_cast<YoloParams *>(params_void_ptr);
+    auto post = Yolov8(roi, params);
+    auto detections = post.decode();
+    hailo_common::add_detections(roi, detections);
+}
+
 void yolov3(HailoROIPtr roi, void *params_void_ptr)
 {
     YoloParams *params = reinterpret_cast<YoloParams *>(params_void_ptr);
