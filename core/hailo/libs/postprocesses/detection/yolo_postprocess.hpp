@@ -60,7 +60,7 @@ class Yolov5Params : public YoloParams
 public:
     Yolov5Params()
     {
-        labels = common::coco_eighty;
+        labels = common::nv_imx5;
         max_boxes = 200;
         anchors_vec = {
             {116, 90, 156, 198, 373, 326},
