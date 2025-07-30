@@ -27,8 +27,8 @@ float YoloOutputLayer::get_confidence(uint row, uint col, uint anchor)
 {
     uint channel = _tensor->features() / NUM_ANCHORS * anchor + CONF_CHANNEL_OFFSET;
     float confidence = _tensor->get_full_percision(row, col, channel, _is_uint16);
-    if (_perform_sigmoid)
-        confidence = sigmoid(confidence);
+    // if (_perform_sigmoid)
+    confidence = sigmoid(confidence);
     return confidence;
 }
 
@@ -50,8 +50,8 @@ uint YoloOutputLayer::get_class_prob(uint row, uint col, uint anchor, uint class
 float Yolov5OL::get_class_conf(uint prob_max)
 {
     float conf = _tensor->fix_scale(prob_max);
-    if (_perform_sigmoid)
-        conf = sigmoid(conf);
+    // if (_perform_sigmoid)
+    conf = sigmoid(conf);
     return conf;
 }
 
