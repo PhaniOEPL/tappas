@@ -97,13 +97,17 @@ void YoloPost::extract_boxes(std::shared_ptr<YoloOutputLayer> layer,
                 confidence = layer->get_confidence(row, col, anchor);
                 if (confidence < _detection_thr)
                     continue;
+                printf("debug1\n");
                 std::tie(class_id, class_confidence) = layer->get_class(row, col, anchor);
+                printf("debug2\n");
                 // Final confidence: box confidence * class probability
                 confidence = confidence * class_confidence;
                 if (confidence > _detection_thr)
                 {
                     std::tie(x, y) = layer->get_center(row, col, anchor);
+                     printf("debug3\n");
                     std::tie(w, h) = layer->get_shape(row, col, anchor, m_image_width, m_image_height);
+                     printf("debug4\n");
                     // Get the top left corner of the object.
                     xmin = (x - (w / 2.0f));
                     ymin = (y - (h / 2.0f));
