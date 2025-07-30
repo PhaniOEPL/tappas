@@ -431,7 +431,9 @@ void yolov5(HailoROIPtr roi, void *params_void_ptr)
 
     auto post = Yolov5(roi, params);
     auto detections = post.decode();
+    printf("Debug5\n");
     hailo_common::add_detections(roi, detections);
+    printf("Frbug6\n");
 }
 
 
