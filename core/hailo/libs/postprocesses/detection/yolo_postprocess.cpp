@@ -486,6 +486,8 @@ YoloParams *init(const std::string config_path, const std::string function_name)
         if (function_name.std::string::compare("yolov5") == 0)
         {
             params = new Yolov5Params;
+            printf("%f\n",params->iou_threshold);
+            printf("%f\n", params->detection_threshold);
         }
         else if (function_name.std::string::compare("yolov3") == 0)
         {
