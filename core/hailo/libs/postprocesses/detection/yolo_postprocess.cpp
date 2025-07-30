@@ -55,16 +55,16 @@ public:
         {
             extract_boxes(layer, objects);
         }
-        printf("Debug7\n");
+        // printf("Debug7\n");
         common::nms(objects, _iou_thr);
-        printf("Debug8\n");
+        // printf("Debug8\n");
         if (objects.size() > _max_boxes)
         {
             HailoBBox bbox(0, 0, 1, 1);
             HailoDetection empty_detection(bbox, "None", 0.0);
             objects.resize(_max_boxes, empty_detection);
         }
-        printf("Debug8\n");
+        // printf("Debug8\n");
 
         return objects;
     }
@@ -100,23 +100,23 @@ void YoloPost::extract_boxes(std::shared_ptr<YoloOutputLayer> layer,
                 confidence = layer->get_confidence(row, col, anchor);
                 if (confidence < _detection_thr)
                     continue;
-                printf("%f\n", confidence);
+                // printf("%f\n", confidence);
                 std::tie(class_id, class_confidence) = layer->get_class(row, col, anchor);
-                printf("%f\n", class_confidence);
+                // printf("%f\n", class_confidence);
                 // Final confidence: box confidence * class probability
                 confidence = confidence * class_confidence;
                 if (confidence > _detection_thr)
                 {
                     std::tie(x, y) = layer->get_center(row, col, anchor);
-                     printf("debug3\n");
+                     // printf("debug3\n");
                     std::tie(w, h) = layer->get_shape(row, col, anchor, m_image_width, m_image_height);
-                     printf("debug4\n");
+                     // printf("debug4\n");
                     // Get the top left corner of the object.
                     xmin = (x - (w / 2.0f));
                     ymin = (y - (h / 2.0f));
-                    printf("Debug10\n");
+                    // printf("Debug10\n");
                     objects.push_back(HailoDetection(HailoBBox(xmin, ymin, w, h), class_id, m_dataset[class_id], confidence));
-                    printf("Debug9\n");
+                    // printf("Debug9\n");
                 }
             }
         }
@@ -431,14 +431,14 @@ void yolov5_vehicles_only(HailoROIPtr roi, void *params_void_ptr)
 void yolov5(HailoROIPtr roi, void *params_void_ptr)
 {
     YoloParams *params = reinterpret_cast<YoloParams *>(params_void_ptr);
-    std::cout << "iou: " << params->iou_threshold 
-          << " det: " << params->detection_threshold << std::endl;
+    // std::cout << "iou: " << params->iou_threshold 
+    //       << " det: " << params->detection_threshold << std::endl;
 
     auto post = Yolov5(roi, params);
     auto detections = post.decode();
-    printf("Debug5\n");
+    // printf("Debug5\n");
     hailo_common::add_detections(roi, detections);
-    printf("Frbug6\n");
+    // printf("Frbug6\n");
 }
 
 
