@@ -55,13 +55,16 @@ public:
         {
             extract_boxes(layer, objects);
         }
+        printf("Debug7\n");
         common::nms(objects, _iou_thr);
+        printf("Debug8\n");
         if (objects.size() > _max_boxes)
         {
             HailoBBox bbox(0, 0, 1, 1);
             HailoDetection empty_detection(bbox, "None", 0.0);
             objects.resize(_max_boxes, empty_detection);
         }
+        printf("Debug8\n");
 
         return objects;
     }
