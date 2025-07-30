@@ -100,9 +100,9 @@ void YoloPost::extract_boxes(std::shared_ptr<YoloOutputLayer> layer,
                 confidence = layer->get_confidence(row, col, anchor);
                 if (confidence < _detection_thr)
                     continue;
-                printf("debug1\n");
+                printf("%f\n", confidence);
                 std::tie(class_id, class_confidence) = layer->get_class(row, col, anchor);
-                printf("debug2\n");
+                printf("%f\n", class_confidence);
                 // Final confidence: box confidence * class probability
                 confidence = confidence * class_confidence;
                 if (confidence > _detection_thr)
