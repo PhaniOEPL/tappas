@@ -422,6 +422,9 @@ void yolov5_vehicles_only(HailoROIPtr roi, void *params_void_ptr)
 void yolov5(HailoROIPtr roi, void *params_void_ptr)
 {
     YoloParams *params = reinterpret_cast<YoloParams *>(params_void_ptr);
+    std::cout << "iou: " << params->iou_threshold 
+          << " det: " << params->detection_threshold << std::endl;
+
     auto post = Yolov5(roi, params);
     auto detections = post.decode();
     hailo_common::add_detections(roi, detections);
