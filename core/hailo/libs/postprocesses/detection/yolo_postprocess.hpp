@@ -22,7 +22,7 @@ public:
     std::vector<std::vector<int>> anchors_vec;
     std::string output_activation; // can be "none" or "sigmoid"
     int label_offset;
-    YoloParams() : iou_threshold(0.45f), detection_threshold(0.3f), output_activation("none"), label_offset(1) {}
+    YoloParams() : iou_threshold(0.45f), detection_threshold(0.3f), output_activation("sigmoid"), label_offset(1) {}
     void check_params_logic(uint num_classes_tensors);
 };
 
