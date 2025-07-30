@@ -114,8 +114,9 @@ void YoloPost::extract_boxes(std::shared_ptr<YoloOutputLayer> layer,
                     // Get the top left corner of the object.
                     xmin = (x - (w / 2.0f));
                     ymin = (y - (h / 2.0f));
+                    printf("Debug10\n");
                     objects.push_back(HailoDetection(HailoBBox(xmin, ymin, w, h), class_id, m_dataset[class_id], confidence));
-                    printf("Debug9/n");
+                    printf("Debug9\n");
                 }
             }
         }
