@@ -91,8 +91,8 @@ void YoloPost::extract_boxes(std::shared_ptr<YoloOutputLayer> layer,
     uint class_id = 0;
     float x, y, h, w, confidence, class_confidence = 0.0f;
     float xmin, ymin = 0.0f;
-    printf("%d\n",layer->_height);
-    printf("%d\n",layer->_width);
+    // printf("%d\n",layer->_height);
+    // printf("%d\n",layer->_width);
     for (uint row = 0; row < layer->_height; ++row)
     {
         for (uint col = 0; col < layer->_width; ++col)
@@ -148,7 +148,7 @@ public:
             }
         }
 
-        printf("%d\n",_tensors.size());
+        // printf("%d\n",_tensors.size());
         // params->check_params_logic(get_num_classes());
     };
 
