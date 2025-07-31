@@ -92,7 +92,7 @@ void YoloPost::extract_boxes(std::shared_ptr<YoloOutputLayer> layer,
     float x, y, h, w, confidence, class_confidence = 0.0f;
     float xmin, ymin = 0.0f;
     printf("%d\n",layer->_height);
-    printf("%d\n",layer->_weight);
+    printf("%d\n",layer->_width);
     for (uint row = 0; row < layer->_height; ++row)
     {
         for (uint col = 0; col < layer->_width; ++col)
