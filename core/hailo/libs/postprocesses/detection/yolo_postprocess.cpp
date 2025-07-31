@@ -523,12 +523,12 @@ YoloParams *init(const std::string config_path, const std::string function_name)
         "$schema": "http://json-schema.org/draft-04/schema#",
         "type": "object",
         "properties": {
-            "iou_threshold": {
+            "nms_iou_th": {
             "type": "number",
             "minimum": 0,
             "maximum": 1
             },
-            "detection_threshold": {
+            "nms_scores_th": {
             "type": "number",
             "minimum": 0,
             "maximum": 1
