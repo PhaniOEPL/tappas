@@ -117,10 +117,6 @@ void YoloPost::extract_boxes(std::shared_ptr<YoloOutputLayer> layer,
                     xmin = (x - (w / 2.0f));
                     ymin = (y - (h / 2.0f));
                     // printf("Debug10\n");
-                    printf("%f\n",xmin);
-                    printf("%f\n",ymin);
-                    printf("%f\n",w);
-                    printf("%f\n",h);
                     objects.push_back(HailoDetection(HailoBBox(xmin, ymin, w, h), class_id, m_dataset[class_id], confidence));
                     // printf("Debug9\n");
                 }
@@ -148,8 +144,8 @@ public:
             for (std::size_t i = 0; i < _tensors.size(); i++)
             {
                 hailo_format_type_t format = _tensors[i]->vstream_info().format.type;
-                printf("%d\n",params->anchors_vec[i]);
-                _layers.push_back(std::make_shared<Yolov5OL>(_tensors[i], params->anchors_vec[i], sigmoid, params->label_offset, format == HAILO_FORMAT_TYPE_UINT16));
+                // printf("%s\n", format);
+                _layers.push_back(std::make_shared<Yolov5OL>(_tensors[i], params->anchors_vec[i], sigmoid, params->label_offset, format ==HAILO_FORMAT_TYPE_UINT16));
             }
         }
 
