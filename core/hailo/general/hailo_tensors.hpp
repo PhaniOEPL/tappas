@@ -99,9 +99,7 @@ public:
         uint width = m_vstream_info.shape.width;
         uint features = m_vstream_info.shape.features;
         uint height = m_vstream_info.shape.height;
-        printf("%u\n", channel);
         int pos = (width * features) * row + features * col + channel;
-        printf("%d\n", pos);
         return m_data[pos];
     }
     uint16_t get_uint16(uint row, uint col, uint channel)
