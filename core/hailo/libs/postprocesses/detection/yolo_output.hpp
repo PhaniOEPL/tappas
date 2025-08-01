@@ -28,7 +28,7 @@ public:
                     bool is_uint16,
                     HailoTensorPtr tensor = nullptr) : _width(width),
                                                        _height(height),
-                                                       _num_classes(16),
+                                                       _num_classes(tensor->features()),
                                                        _anchors(anchors),
                                                        label_offset(label_offset),
                                                        _perform_sigmoid(perform_sigmoid),
