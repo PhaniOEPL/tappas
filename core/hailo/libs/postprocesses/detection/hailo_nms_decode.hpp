@@ -69,15 +69,19 @@ static int g_objCounter=0;
 
 bool is_class_allowed(uint32_t class_index)
     {
+
+		if (!g_yolo_shmp) // shared memory not attached
+            return true;  // fail-safe: allow everything
+
         switch (class_index)
         {
-            case 1:  return g_yolo_shm._configo.bIsPeopleDetectionEnabled; // person
-            case 2:  return g_yolo_shm._configo.bIsCarDetectionEnabled;    // car
-            case 3:  return g_yolo_shm._configo.bIsTruckDetectionEnabled;  // truck
-            case 4:  return g_yolo_shm._configo.bIsFlightDetectionEnabled; // airplane
-            case 5:  return g_yolo_shm._configo.bIsBoatDetectionEnabled;   // boat
-            case 6:  return g_yolo_shm._configo.bIsBirdDetectionEnabled;   // bird
-            case 7:  return g_yolo_shm._configo.bIsAnimalDetectionEnabled; // animal (generic)
+            case 1:  return g_yolo_shmp._configo.bIsPeopleDetectionEnabled; // person
+            case 2:  return g_yolo_shmp._configo.bIsCarDetectionEnabled;    // car
+            case 3:  return g_yolo_shmp._configo.bIsTruckDetectionEnabled;  // truck
+            case 4:  return g_yolo_shmp._configo.bIsFlightDetectionEnabled; // airplane
+            case 5:  return g_yolo_shmp._configo.bIsBoatDetectionEnabled;   // boat
+            case 6:  return g_yolo_shmp._configo.bIsBirdDetectionEnabled;   // bird
+            case 7:  return g_yolo_shmp._configo.bIsAnimalDetectionEnabled; // animal (generic)
             default: return true; // If unmapped, allow by default
         }
     }
