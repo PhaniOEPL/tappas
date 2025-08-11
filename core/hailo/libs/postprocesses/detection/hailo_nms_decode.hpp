@@ -34,6 +34,18 @@ struct ObjectDetectionResultsType  //nv-imx
    int classID;
 };
 
+struct ObjectDetectionConfigInfoo
+{
+    bool bIsCarDetectionEnabled;
+    bool bIsTruckDetectionEnabled;
+    bool bIsFlightDetectionEnabled;
+    bool bIsBoatDetectionEnabled;
+    bool bIsBirdDetectionEnabled;
+    bool bIsAnimalDetectionEnabled;
+    bool bIsPeopleDetectionEnabled;
+
+};
+
 #define YOLO_SHM_KEY 0x1222
 struct yolo_shmseg 
 {
@@ -53,6 +65,24 @@ static struct yolo_shmseg *g_yolo_shmp=nullptr;
 struct yolo_shmseg g_yolo_shm;
 static bool g_bShmInitialized=false;
 static int g_objCounter=0;
+
+bool is_class_allowed(uint32_t class_index)
+    {
+        switch (class_index)
+        {
+            case 1:  return g_yolo_shm._configo.bIsPeopleDetectionEnabled; // person
+            case 2:  return g_yolo_shm._configo.bIsCarDetectionEnabled;    // car
+            case 3:  return g_yolo_shm._configo.bIsTruckDetectionEnabled;  // truck
+            case 4:  return g_yolo_shm._configo.bIsFlightDetectionEnabled; // airplane
+            case 5:  return g_yolo_shm._configo.bIsBoatDetectionEnabled;   // boat
+            case 6:  return g_yolo_shm._configo.bIsBirdDetectionEnabled;   // bird
+            case 7:  return g_yolo_shm._configo.bIsAnimalDetectionEnabled; // animal (generic)
+            default: return true; // If unmapped, allow by default
+        }
+    }
+
+
+
 
 class HailoNMSDecode
 {
@@ -95,6 +125,11 @@ private:
 		std::tie(w, h) = get_shape(&dequant_bbox); // parse width and height of the box   
 		unsigned int area=(unsigned int)(g_yolo_shm.model_input_size_x*g_yolo_shm.model_input_size_y*w*h);
 
+
+		if (!is_class_allowed(class_index))
+            return;
+
+		
 		if(area <= g_yolo_shm.rectAreaThresh_S)	// Smallest detection
 		{
 			if(confidence  >= g_yolo_shm.detectThresh_L)
