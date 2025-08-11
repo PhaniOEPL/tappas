@@ -75,13 +75,13 @@ bool is_class_allowed(uint32_t class_index)
 
         switch (class_index)
         {
-            case 1:  return g_yolo_shmp._configo.bIsPeopleDetectionEnabled; // person
-            case 2:  return g_yolo_shmp._configo.bIsCarDetectionEnabled;    // car
-            case 3:  return g_yolo_shmp._configo.bIsTruckDetectionEnabled;  // truck
-            case 4:  return g_yolo_shmp._configo.bIsFlightDetectionEnabled; // airplane
-            case 5:  return g_yolo_shmp._configo.bIsBoatDetectionEnabled;   // boat
-            case 6:  return g_yolo_shmp._configo.bIsBirdDetectionEnabled;   // bird
-            case 7:  return g_yolo_shmp._configo.bIsAnimalDetectionEnabled; // animal (generic)
+            case 1:  return g_yolo_shmp->_configo.bIsPeopleDetectionEnabled; // person
+            case 2:  return g_yolo_shmp->_configo.bIsCarDetectionEnabled;    // car
+            case 3:  return g_yolo_shmp->_configo.bIsTruckDetectionEnabled;  // truck
+            case 4:  return g_yolo_shmp->_configo.bIsFlightDetectionEnabled; // airplane
+            case 5:  return g_yolo_shmp->_configo.bIsBoatDetectionEnabled;   // boat
+            case 6:  return g_yolo_shmp->_configo.bIsBirdDetectionEnabled;   // bird
+            case 7:  return g_yolo_shmp->_configo.bIsAnimalDetectionEnabled; // animal (generic)
             default: return true; // If unmapped, allow by default
         }
     }
