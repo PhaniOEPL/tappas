@@ -46,7 +46,7 @@ struct ObjectDetectionConfigInfoo
 
 };
 
-#define YOLO_SHM_KEY 0x1222
+#define YOLO_SHM_KEY 0x1322
 struct yolo_shmseg 
 {
     ObjectDetectionResultsType _detections[DEFAULT_MAX_BOXES];
