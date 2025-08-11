@@ -75,9 +75,7 @@ bool is_class_allowed(uint32_t class_index)
 
         switch (class_index)
         {
-            case 1:  
-				printf("%d\n", g_yolo_shmp->_configo.bIsPeopleDetectionEnabled);
-				return g_yolo_shmp->_configo.bIsPeopleDetectionEnabled; // person
+            case 1:  return g_yolo_shmp->_configo.bIsPeopleDetectionEnabled; // person
             case 2:  return g_yolo_shmp->_configo.bIsCarDetectionEnabled;    // car
             case 3:  return g_yolo_shmp->_configo.bIsTruckDetectionEnabled;  // truck
             case 4:  return g_yolo_shmp->_configo.bIsFlightDetectionEnabled; // airplane
@@ -133,8 +131,9 @@ private:
 		unsigned int area=(unsigned int)(g_yolo_shm.model_input_size_x*g_yolo_shm.model_input_size_y*w*h);
 
 
-		if (!is_class_allowed(class_index))
-            return;
+		// if (!is_class_allowed(class_index))
+		// 	printf("not going inside this");
+  //           return;
 
 		
 		if(area <= g_yolo_shm.rectAreaThresh_S)	// Smallest detection
