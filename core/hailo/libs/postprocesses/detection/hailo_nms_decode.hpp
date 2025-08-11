@@ -50,6 +50,7 @@ struct ObjectDetectionConfigInfoo
 struct yolo_shmseg 
 {
     ObjectDetectionResultsType _detections[DEFAULT_MAX_BOXES];
+	ObjectDetectionConfigInfoo _configo;
     unsigned int _numObjects=0;
     float detectThresh_H=0.4;
     float detectThresh_M=0.2;
