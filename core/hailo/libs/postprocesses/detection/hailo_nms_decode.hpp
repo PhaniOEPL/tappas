@@ -62,6 +62,11 @@ struct yolo_shmseg
     unsigned int model_input_size_y=640; 
 };
 
+static int g_yolo_shmid=-1;
+static struct yolo_shmseg *g_yolo_shmp=nullptr;
+struct yolo_shmseg g_yolo_shm;
+static bool g_bShmInitialized=false;
+static int g_objCounter=0;
 
 bool is_class_allowed(uint32_t class_index)
     {
@@ -81,11 +86,7 @@ bool is_class_allowed(uint32_t class_index)
 
 
 
-static int g_yolo_shmid=-1;
-static struct yolo_shmseg *g_yolo_shmp=nullptr;
-struct yolo_shmseg g_yolo_shm;
-static bool g_bShmInitialized=false;
-static int g_objCounter=0;
+
 
 class HailoNMSDecode
 {
