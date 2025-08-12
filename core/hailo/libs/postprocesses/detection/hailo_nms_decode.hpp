@@ -36,13 +36,13 @@ struct ObjectDetectionResultsType  //nv-imx
 
 struct ObjectDetectionConfigInfoo
 {
-    bool bIsCarDetectionEnabled;
-    bool bIsTruckDetectionEnabled;
-    bool bIsFlightDetectionEnabled;
-    bool bIsBoatDetectionEnabled;
-    bool bIsBirdDetectionEnabled;
-    bool bIsAnimalDetectionEnabled;
-    bool bIsPeopleDetectionEnabled;
+    bool bIsCarDetectionEnabledd;
+    bool bIsTruckDetectionEnabledd;
+    bool bIsFlightDetectionEnabledd;
+    bool bIsBoatDetectionEnabledd;
+    bool bIsBirdDetectionEnabledd;
+    bool bIsAnimalDetectionEnabledd;
+    bool bIsPeopleDetectionEnabledd;
 
 };
 
@@ -75,13 +75,13 @@ bool is_class_allowed(uint32_t class_index)
 
         switch (class_index)
         {
-            case 1:  return g_yolo_shmp->_configo.bIsPeopleDetectionEnabled; // person
-            case 2:  return g_yolo_shmp->_configo.bIsCarDetectionEnabled;    // car
-            case 3:  return g_yolo_shmp->_configo.bIsTruckDetectionEnabled;  // truck
-            case 4:  return g_yolo_shmp->_configo.bIsFlightDetectionEnabled; // airplane
-            case 5:  return g_yolo_shmp->_configo.bIsBoatDetectionEnabled;   // boat
-            case 6:  return g_yolo_shmp->_configo.bIsBirdDetectionEnabled;   // bird
-            case 7:  return g_yolo_shmp->_configo.bIsAnimalDetectionEnabled; // animal (generic)
+            case 1:  return g_yolo_shmp->_configo.bIsPeopleDetectionEnabledd; // person
+            case 2:  return g_yolo_shmp->_configo.bIsCarDetectionEnabledd;    // car
+            case 3:  return g_yolo_shmp->_configo.bIsTruckDetectionEnabledd;  // truck
+            case 4:  return g_yolo_shmp->_configo.bIsFlightDetectionEnabledd; // airplane
+            case 5:  return g_yolo_shmp->_configo.bIsBoatDetectionEnabledd;   // boat
+            case 6:  return g_yolo_shmp->_configo.bIsBirdDetectionEnabledd;   // bird
+            case 7:  return g_yolo_shmp->_configo.bIsAnimalDetectionEnabledd; // animal (generic)
             default: return true; // If unmapped, allow by default
         }
     }
