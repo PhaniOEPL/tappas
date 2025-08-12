@@ -131,9 +131,9 @@ private:
 		unsigned int area=(unsigned int)(g_yolo_shm.model_input_size_x*g_yolo_shm.model_input_size_y*w*h);
 
 
-		// if (!is_class_allowed(class_index))
-		// 	printf("not going inside this");
-  //           return;
+		if (!is_class_allowed(class_index))
+			// printf("not going inside this");
+            return;
 
 		
 		if(area <= g_yolo_shm.rectAreaThresh_S)	// Smallest detection
