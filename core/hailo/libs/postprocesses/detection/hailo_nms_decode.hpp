@@ -34,17 +34,17 @@ struct ObjectDetectionResultsType  //nv-imx
    int classID;
 };
 
-struct ObjectDetectionConfigInfoo
-{
-    bool bIsCarDetectionEnabled;
-    bool bIsTruckDetectionEnabled;
-    bool bIsFlightDetectionEnabled;
-    bool bIsBoatDetectionEnabled;
-    bool bIsBirdDetectionEnabled;
-    bool bIsAnimalDetectionEnabled;
-    bool bIsPeopleDetectionEnabled;
+// struct ObjectDetectionConfigInfoo
+// {
+//     bool bIsCarDetectionEnabled;
+//     bool bIsTruckDetectionEnabled;
+//     bool bIsFlightDetectionEnabled;
+//     bool bIsBoatDetectionEnabled;
+//     bool bIsBirdDetectionEnabled;
+//     bool bIsAnimalDetectionEnabled;
+//     bool bIsPeopleDetectionEnabled;
 
-};
+// };
 
 #define YOLO_SHM_KEY 0x1322
 struct yolo_shmseg 
