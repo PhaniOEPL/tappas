@@ -59,7 +59,7 @@ struct yolo_shmseg
     unsigned int rectAreaThresh_M =256;
     unsigned int rectAreaThresh_S =100;
     unsigned int model_input_size_x=640;
-    unsigned int model_input_size_y=640; 
+    unsigned int model_input_size_y=512; 
 };
 
 static int g_yolo_shmid=-1;
@@ -70,15 +70,26 @@ static int g_objCounter=0;
 
 bool is_class_allowed(uint32_t class_index)
     {
-        switch (class_index)
+        switch (class_index-1)
         {
             case 1:  return g_yolo_shm._configo.bIsPeopleDetectionEnabled; // person
             case 2:  return g_yolo_shm._configo.bIsCarDetectionEnabled;    // car
             case 3:  return g_yolo_shm._configo.bIsTruckDetectionEnabled;  // truck
-            case 4:  return g_yolo_shm._configo.bIsFlightDetectionEnabled; // airplane
-            case 5:  return g_yolo_shm._configo.bIsBoatDetectionEnabled;   // boat
-            case 6:  return g_yolo_shm._configo.bIsBirdDetectionEnabled;   // bird
-            case 7:  return g_yolo_shm._configo.bIsAnimalDetectionEnabled; // animal (generic)
+			case 4:  return false;
+			case 5: 
+            case 6: 
+				return g_yolo_shm._configo.bIsBoatDetectionEnabled;   // boat
+			case 7:
+				return g_yolo_shm._configo.bIsBirdDetectionEnabled;   // bird
+            case 8:
+			case 9:
+				return g_yolo_shm._configo.bIsAnimalDetectionEnabled; // animal (generic)
+			case 10:
+            case 11:
+			case 12:
+			case 13:
+				return g_yolo_shm._configo.bIsFlightDetectionEnabled; // airplane
+            
             default: return true; // If unmapped, allow by default
         }
     }
