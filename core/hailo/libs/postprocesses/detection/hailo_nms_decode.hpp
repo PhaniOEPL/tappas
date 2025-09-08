@@ -90,7 +90,7 @@ bool is_class_allowed(uint32_t class_index)
 			case 13:
 				return g_yolo_shm._configo.bIsFlightDetectionEnabled; // airplane
             
-            default: return true; // If unmapped, allow by default
+            default: return false; // If unmapped, allow by default
         }
     }
 
