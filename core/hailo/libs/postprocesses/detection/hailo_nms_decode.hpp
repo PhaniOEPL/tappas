@@ -138,8 +138,8 @@ private:
 		std::tie(w, h) = get_shape(&dequant_bbox); // parse width and height of the box   
 		unsigned int area=(unsigned int)(g_yolo_shm.model_input_size_x*g_yolo_shm.model_input_size_y*w*h);
  	
-	if (!is_class_allowed(class_index))
-            return;
+	// if (!is_class_allowed(class_index))
+ //            return;
 
 		if(area <= g_yolo_shm.rectAreaThresh_S)	// Smallest detection
 		{
