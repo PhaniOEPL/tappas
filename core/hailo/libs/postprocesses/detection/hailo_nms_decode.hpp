@@ -148,10 +148,10 @@ private:
 				if(_objects.size() < DEFAULT_MAX_BOXES)
 				{
                 		_objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min*640/512, w, h*640/512), class_index, labels_dict[class_index], confidence));
-				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shm.model_input_size_x);
-				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shm.model_input_size_y*640/512);
-				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shm.model_input_size_x);
-				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shm.model_input_size_y*640/512);
+				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shmp->model_input_size_x);
+				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shmp->model_input_size_y*640/512);
+				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shmp->model_input_size_x);
+				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shmp->model_input_size_y*640/512);
 				g_yolo_shmp->_detections[g_objCounter].classID= (int)(class_index);
 				g_objCounter++;
 				}
@@ -164,10 +164,10 @@ private:
 				if(_objects.size() < DEFAULT_MAX_BOXES)
 				{
                 		_objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min*640/512, w, h*640/512), class_index, labels_dict[class_index], confidence));
-				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shm.model_input_size_x);
-				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shm.model_input_size_y*640/512);
-				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shm.model_input_size_x);
-				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shm.model_input_size_y*640/512);
+				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shmp->model_input_size_x);
+				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shmp->model_input_size_y*640/512);
+				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shmp->model_input_size_x);
+				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shmp->model_input_size_y*640/512);
 				g_yolo_shmp->_detections[g_objCounter].classID= (int)(class_index);
 				g_objCounter++;
 				}
@@ -180,20 +180,20 @@ private:
 				if(_objects.size() < DEFAULT_MAX_BOXES)
 				{
                 		_objects.push_back(HailoDetection(HailoBBox(dequant_bbox.x_min, dequant_bbox.y_min*640/512, w, h*640/512), class_index, labels_dict[class_index], confidence));
-				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shm.model_input_size_x);
-				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shm.model_input_size_y*640/512);
-				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shm.model_input_size_x);
-				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shm.model_input_size_y*640/512);
+				g_yolo_shmp->_detections[g_objCounter].tlx    = (int)(dequant_bbox.x_min*g_yolo_shmp->model_input_size_x);
+				g_yolo_shmp->_detections[g_objCounter].tly    = (int)(dequant_bbox.y_min*g_yolo_shmp->model_input_size_y*640/512);
+				g_yolo_shmp->_detections[g_objCounter].width  = (int)(w*g_yolo_shmp->model_input_size_x);
+				g_yolo_shmp->_detections[g_objCounter].height = (int)(h*g_yolo_shmp->model_input_size_y*640/512);
 				g_yolo_shmp->_detections[g_objCounter].classID= (int)(class_index);
 				g_objCounter++;
 				}
 			}
 		}
 		g_yolo_shmp->_numObjects=g_objCounter;
-	    printf("hailo detection x : %d\n", g_yolo_shmp->_detections[g_objCounter].tlx);
-	    printf("hailo detection x : %d\n", g_yolo_shmp->_detections[g_objCounter].tly);
-	    printf("hailo detection width : %d\n", g_yolo_shmp->_detections[g_objCounter].width);
-	    printf("hailo detection height : %d\n", g_yolo_shmp->_detections[g_objCounter].height);
+	    // printf("hailo detection x : %d\n", g_yolo_shmp->_detections[g_objCounter].tlx);
+	    // printf("hailo detection x : %d\n", g_yolo_shmp->_detections[g_objCounter].tly);
+	    // printf("hailo detection width : %d\n", g_yolo_shmp->_detections[g_objCounter].width);
+	    // printf("hailo detection height : %d\n", g_yolo_shmp->_detections[g_objCounter].height);
 	    // printf("hailo detection classID : %d\n", g_yolo_shmp->_detections[g_objCounter].classID);
 
     }
