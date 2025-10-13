@@ -21,6 +21,7 @@ static const std::string DEFAULT_YOLOV5M_VEHICLES_OUTPUT_LAYER = "yolov5m_vehicl
 static const std::string DEFAULT_YOLOV8S_OUTPUT_LAYER = "yolov8s/yolov8_nms_postprocess";
 static const std::string DEFAULT_YOLOV8M_OUTPUT_LAYER = "yolov8m/yolov8_nms_postprocess";
 static const std::string DEFAULT_YOLOV5M_8M_OUTPUT_LAYER = "nms_postprocess";
+static const std::string DEFAULT_YOLOV8L_OUTPUT_LAYER = "yolov8l/yolov8_nms_postprocess";
 
 #if __GNUC__ > 8
 #include <filesystem>
@@ -188,6 +189,15 @@ void yolov8m(HailoROIPtr roi)
     //     HailoBBox new_bbox(xmin, ymin, xmax - xmin, ymax - ymin);
     //     detection->set_bbox(new_bbox);
     // }
+    hailo_common::add_detections(roi, detections);
+}
+
+
+
+void yolov8l(HailoROIPtr roi)
+{
+    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8L_OUTPUT_LAYER), common::nv_imx);
+    auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
     hailo_common::add_detections(roi, detections);
 }
 
