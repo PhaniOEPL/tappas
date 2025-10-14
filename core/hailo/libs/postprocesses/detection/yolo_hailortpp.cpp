@@ -18,7 +18,7 @@
 static const std::string DEFAULT_YOLOV5S_OUTPUT_LAYER = "yolov5s_nv12/yolov5_nms_postprocess";
 static const std::string DEFAULT_YOLOV5M_OUTPUT_LAYER = "yolov5_nms_postprocess";
 static const std::string DEFAULT_YOLOV5M_VEHICLES_OUTPUT_LAYER = "yolov5m_vehicles/yolov5_nms_postprocess";
-static const std::string DEFAULT_YOLOV8S_OUTPUT_LAYER = "yolov8s/yolov8_nms_postprocess";
+static const std::string DEFAULT_YOLOV8S_OUTPUT_LAYER = "Vis8s_1280x7044_v8/yolov8_nms_postprocess";
 static const std::string DEFAULT_YOLOV8M_OUTPUT_LAYER = "yolov8m/yolov8_nms_postprocess";
 static const std::string DEFAULT_YOLOV5M_8M_OUTPUT_LAYER = "nms_postprocess";
 static const std::string DEFAULT_YOLOV8L_OUTPUT_LAYER = "yolov8l/yolov8_nms_postprocess";
