@@ -9,6 +9,61 @@
 #include "gst_hailo_meta.hpp"
 #include "gsthailotileaggregator.hpp"
 
+//shared mem include
+#include<stdio.h>
+#include<sys/ipc.h>
+#include<sys/shm.h>
+#include<sys/types.h>
+#include<errno.h>
+#include<stdlib.h>
+
+static const int DEFAULT_MAX_BOXES = 50;
+static const float DEFAULT_THRESHOLD = 0.4;
+
+struct ObjectDetectionResultsType  //nv-imx
+{
+   int tlx;
+   int tly;
+   int width;
+   int height;
+   int classID;
+};
+
+
+struct ObjectDetectionConfigInfoo
+{
+    bool bIsCarDetectionEnabled;
+    bool bIsTruckDetectionEnabled;
+    bool bIsFlightDetectionEnabled;
+    bool bIsBoatDetectionEnabled;
+    bool bIsBirdDetectionEnabled;
+    bool bIsAnimalDetectionEnabled;
+    bool bIsPeopleDetectionEnabled;
+
+};
+
+#define YOLO_SHM_KEY 0x1322
+struct yolo_shmseg 
+{
+    ObjectDetectionResultsType _detections[DEFAULT_MAX_BOXES];
+    unsigned int _numObjects=0;
+    float detectThresh_H=0.4;
+    float detectThresh_M=0.2;
+    float detectThresh_L=0.1;
+    unsigned int rectAreaThresh_M =256;
+    unsigned int rectAreaThresh_S =100;
+    unsigned int model_input_size_x=640;
+    unsigned int model_input_size_y=512; 
+};
+
+static int g_yolo_shmid=-1;
+static struct yolo_shmseg *g_yolo_shmp=nullptr;
+struct yolo_shmseg g_yolo_shm;
+static bool g_bShmInitialized=false;
+static int g_objCounter=0;
+
+
+
 GST_DEBUG_CATEGORY_STATIC(gst_hailotileaggregator_debug);
 #define GST_CAT_DEFAULT gst_hailotileaggregator_debug
 
@@ -218,6 +273,50 @@ gst_hailotileaggregator_post_aggregation(GstHailoAggregator *hailoaggregator, Ha
 
     // Perform NMS on the main frame's detections after aggragation is done
     nms(hailo_roi, hailotileaggregator->iou_threshold);
+
+    // adding BB to our shared memory
+    auto detections = hailo_common::get_hailo_detections(hailo_roi);
+
+// Initialize SHM if first use
+    if (g_yolo_shmid == -1) {
+        g_yolo_shmid = shmget(YOLO_SHM_KEY, sizeof(struct yolo_shmseg), 0644 | IPC_CREAT);
+        if (g_yolo_shmid < 0) {
+            g_printerr("YOLO SHM allocation failed\n");
+        } else {
+            g_yolo_shmp = (struct yolo_shmseg*)shmat(g_yolo_shmid, NULL, 0);
+            if (g_yolo_shmp == NULL) {
+                g_printerr("YOLO SHM attach failed\n");
+            }
+        }
+    }
+    
+    if (g_yolo_shmp != NULL) {
+        g_objCounter = 0;
+        g_yolo_shmp->_numObjects = 0;
+    
+        for (auto det : detections) {
+            if (g_objCounter >= DEFAULT_MAX_BOXES)
+                break;
+    
+            HailoBBox bbox = det->get_bbox();
+    
+            int tlx = bbox.xmin() * g_yolo_shmp->model_input_size_x;
+            int tly = bbox.ymin() * g_yolo_shmp->model_input_size_y;
+            int w   = bbox.width() * g_yolo_shmp->model_input_size_x;
+            int h   = bbox.height() * g_yolo_shmp->model_input_size_y;
+            int class_id = det->get_class_id();
+    
+            g_yolo_shmp->_detections[g_objCounter].tlx = tlx;
+            g_yolo_shmp->_detections[g_objCounter].tly = tly;
+            g_yolo_shmp->_detections[g_objCounter].width = w;
+            g_yolo_shmp->_detections[g_objCounter].height = h;
+            g_yolo_shmp->_detections[g_objCounter].classID = class_id;
+    
+            g_objCounter++;
+        }
+    
+        g_yolo_shmp->_numObjects = g_objCounter;
+    }
 }
 
 static void
