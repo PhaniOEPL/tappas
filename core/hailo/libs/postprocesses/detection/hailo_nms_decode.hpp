@@ -188,7 +188,7 @@ private:
 				}
 			}
 		}
-		printf("g_yolo_shmp->_numObjects=g_objCounter : %d \n", (g_yolo_shmp->_numObjects=g_objCounter) );
+		printf("g_yolo_shmp->_numObjects=g_objCounter : %d \n", g_objCounter);
 		g_yolo_shmp->_numObjects=g_objCounter;
 	    // printf("hailo detection x : %d\n", g_yolo_shmp->_detections[g_objCounter].tlx);
 	    // printf("hailo detection x : %d\n", g_yolo_shmp->_detections[g_objCounter].tly);
