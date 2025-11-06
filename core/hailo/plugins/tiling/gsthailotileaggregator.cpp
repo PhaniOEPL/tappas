@@ -42,7 +42,7 @@ struct ObjectDetectionConfigInfoo
 
 };
 
-#define YOLO_SHM_KEY 0x1222
+#define YOLO_SHM_KEY 0x1422
 struct yolo_shmseg 
 {
     ObjectDetectionResultsType _detections[DEFAULT_MAX_BOXES];
@@ -288,7 +288,6 @@ gst_hailotileaggregator_post_aggregation(GstHailoAggregator *hailoaggregator, Ha
             if (g_yolo_shmp == NULL) {
                 g_printerr("YOLO SHM attach failed\n");
             }
-            printf("YOLO SHM attach success\n");
         }
     }
     
@@ -296,7 +295,6 @@ gst_hailotileaggregator_post_aggregation(GstHailoAggregator *hailoaggregator, Ha
         printf("inside g_yolo_shmp != NULL \n");
         g_objCounter = 0;
         g_yolo_shmp->_numObjects = 0;
-        g_printerr("inside adding BB\n");
         for (auto det : detections) {
             if (g_objCounter >= DEFAULT_MAX_BOXES)
                 break;
