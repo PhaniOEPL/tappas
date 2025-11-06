@@ -215,7 +215,7 @@ public:
 
         if(g_bShmInitialized==false)
 	{
-		printf("nv-imx: 1.4.2\n");
+		printf("Suraj nv-imx: 1.4.2\n");
 		size_t size = sizeof(struct yolo_shmseg);
 		printf("Size of struct = %lu\n", size);
 		//printf("sizeof(struct yolo_shmseg) = %zu\n", sizeof(struct yolo_shmseg));
