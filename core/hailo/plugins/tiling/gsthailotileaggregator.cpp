@@ -312,12 +312,15 @@ gst_hailotileaggregator_post_aggregation(GstHailoAggregator *hailoaggregator, Ha
             g_yolo_shmp->_detections[g_objCounter].width = w;
             g_yolo_shmp->_detections[g_objCounter].height = h;
             g_yolo_shmp->_detections[g_objCounter].classID = class_id;
-            printf("inside g_yolo_shmp class_id %d \n", class_id);
+            printf("inside g_yolo_shmp class_id %d \n", class_id);           
+            printf("inside g_yolo_shmp w %d \n", w);
+            printf("inside g_yolo_shmp h %d \n", h);
     
             g_objCounter++;
         }
     
         g_yolo_shmp->_numObjects = g_objCounter;
+        printf("inside g_yolo_shmp g_objCounter %d \n", g_objCounter );
     }
 }
 
