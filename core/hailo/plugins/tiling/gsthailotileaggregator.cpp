@@ -42,7 +42,7 @@ struct ObjectDetectionConfigInfoo
 
 };
 
-#define YOLO_SHM_KEY 0x1422
+#define YOLO_SHM_KEY 0x1222
 struct yolo_shmseg 
 {
     ObjectDetectionResultsType _detections[DEFAULT_MAX_BOXES];
@@ -275,7 +275,7 @@ gst_hailotileaggregator_post_aggregation(GstHailoAggregator *hailoaggregator, Ha
     nms(hailo_roi, hailotileaggregator->iou_threshold);
 
     // adding BB to our shared memory
-    g_printerr("inside agg func \n");
+    printf("inside agg func \n");
     auto detections = hailo_common::get_hailo_detections(hailo_roi);
 
 // Initialize SHM if first use
@@ -288,11 +288,12 @@ gst_hailotileaggregator_post_aggregation(GstHailoAggregator *hailoaggregator, Ha
             if (g_yolo_shmp == NULL) {
                 g_printerr("YOLO SHM attach failed\n");
             }
-            g_printerr("YOLO SHM attach success\n");
+            printf("YOLO SHM attach success\n");
         }
     }
     
     if (g_yolo_shmp != NULL) {
+        printf("inside g_yolo_shmp != NULL \n");
         g_objCounter = 0;
         g_yolo_shmp->_numObjects = 0;
         g_printerr("inside adding BB\n");
@@ -313,6 +314,7 @@ gst_hailotileaggregator_post_aggregation(GstHailoAggregator *hailoaggregator, Ha
             g_yolo_shmp->_detections[g_objCounter].width = w;
             g_yolo_shmp->_detections[g_objCounter].height = h;
             g_yolo_shmp->_detections[g_objCounter].classID = class_id;
+            printf("inside g_yolo_shmp class_id %d \n", class_id);
     
             g_objCounter++;
         }
