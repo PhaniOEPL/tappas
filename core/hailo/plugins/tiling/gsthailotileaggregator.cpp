@@ -301,10 +301,10 @@ gst_hailotileaggregator_post_aggregation(GstHailoAggregator *hailoaggregator, Ha
     
             HailoBBox bbox = det->get_bbox();
     
-            int tlx = bbox.xmin() * g_yolo_shmp->model_input_size_x;
-            int tly = bbox.ymin() * g_yolo_shmp->model_input_size_y;
-            int w   = bbox.width() * g_yolo_shmp->model_input_size_x;
-            int h   = bbox.height() * g_yolo_shmp->model_input_size_y;
+            int tlx = bbox.xmin() * frame_width;
+            int tly = bbox.ymin() * frame_height;
+            int w   = bbox.width() * frame_width;
+            int h   = bbox.height() * frame_height;
             int class_id = det->get_class_id();
     
             g_yolo_shmp->_detections[g_objCounter].tlx = tlx;
