@@ -275,7 +275,7 @@ gst_hailotileaggregator_post_aggregation(GstHailoAggregator *hailoaggregator, Ha
     nms(hailo_roi, hailotileaggregator->iou_threshold);
 
     // adding BB to our shared memory
-    printf("inside agg func \n");
+    
     auto detections = hailo_common::get_hailo_detections(hailo_roi);
 
 // Initialize SHM if first use
@@ -292,7 +292,6 @@ gst_hailotileaggregator_post_aggregation(GstHailoAggregator *hailoaggregator, Ha
     }
     
     if (g_yolo_shmp != NULL) {
-        printf("inside g_yolo_shmp != NULL \n");
         g_objCounter = 0;
         g_yolo_shmp->_numObjects = 0;
         for (auto det : detections) {
@@ -311,16 +310,11 @@ gst_hailotileaggregator_post_aggregation(GstHailoAggregator *hailoaggregator, Ha
             g_yolo_shmp->_detections[g_objCounter].tly = tly;
             g_yolo_shmp->_detections[g_objCounter].width = w;
             g_yolo_shmp->_detections[g_objCounter].height = h;
-            g_yolo_shmp->_detections[g_objCounter].classID = class_id;
-            printf("inside g_yolo_shmp class_id %d \n", class_id);           
-            printf("inside g_yolo_shmp w %d \n", w);
-            printf("inside g_yolo_shmp h %d \n", h);
-    
+            g_yolo_shmp->_detections[g_objCounter].classID = class_id;    
             g_objCounter++;
         }
     
         g_yolo_shmp->_numObjects = g_objCounter;
-        printf("inside g_yolo_shmp g_objCounter %d \n", g_objCounter );
     }
 }
 
