@@ -277,6 +277,10 @@ public:
         ymin = 0.551805 xmin = 0.389635 ymax = 0.741805 xmax = 0.561974 score = 0.95
         */
 
+		g_objCounter = 0;
+    	g_yolo_shmp->_numObjects = 0;
+    	memset(g_yolo_shmp->_detections, 0, sizeof(g_yolo_shmp->_detections));
+		
         if (!_nms_output_tensor)
             return std::vector<HailoDetection>{};
 
