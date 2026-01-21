@@ -291,35 +291,11 @@ inline std::vector<STrack> JDETracker::update(std::vector<HailoDetectionPtr> &in
     // Step 2: First association, tracked with embedding
     //******************************************************************
     // Calculate the distances between the tracked/lost stracks and the newly detected inputs
-    //embedding_distance(strack_pool, detections, distances); // Calculate the distances
-    //fuse_motion(distances, strack_pool, detections);        // Create the cost matrix
+    embedding_distance(strack_pool, detections, distances); // Calculate the distances
+    fuse_motion(distances, strack_pool, detections);        // Create the cost matrix
 
     // Use linear assignment to find matches
-    //linear_assignment(distances, strack_pool.size(), detections.size(), this->m_kalman_dist_thr, matches, unmatched_tracked, unmatched_detections);
-
-    // Update the matches
-    //update_matches(matches, strack_pool, detections, activated_stracks);
-
-    // Use the unmatched_detections indices to get a vector of just the unmatched new detections
-    //keep_indices(detections, unmatched_detections);
-
-    // Use the unmatched_tracked indices to get a vector of only unmatched, previously tracked, but-not-yet-lost stracks
-    //keep_indices(strack_pool, unmatched_tracked);
-
-
-
-    //******************************************************************
-    // Step 3.1: First association, tracked with IOU
-    //******************************************************************
-
-
-    //calculate the iou distance of what's left
-    distances = iou_distance(strack_pool, detections);
-
-    fuse_motion_custom(distances, strack_pool, detections);
-
-    // Use linear assignment to find matches
-    linear_assignment(distances, strack_pool.size(), detections.size(), this->m_iou_thr, matches, unmatched_tracked, unmatched_detections);
+    linear_assignment(distances, strack_pool.size(), detections.size(), this->m_kalman_dist_thr, matches, unmatched_tracked, unmatched_detections);
 
     // Update the matches
     update_matches(matches, strack_pool, detections, activated_stracks);
@@ -329,6 +305,30 @@ inline std::vector<STrack> JDETracker::update(std::vector<HailoDetectionPtr> &in
 
     // Use the unmatched_tracked indices to get a vector of only unmatched, previously tracked, but-not-yet-lost stracks
     keep_indices(strack_pool, unmatched_tracked);
+
+
+
+    //******************************************************************
+    // Step 3.1: First association, tracked with IOU
+    //******************************************************************
+
+
+    //calculate the iou distance of what's left
+    // distances = iou_distance(strack_pool, detections);
+
+    // fuse_motion_custom(distances, strack_pool, detections);
+
+    // // Use linear assignment to find matches
+    // linear_assignment(distances, strack_pool.size(), detections.size(), this->m_iou_thr, matches, unmatched_tracked, unmatched_detections);
+
+    // // Update the matches
+    // update_matches(matches, strack_pool, detections, activated_stracks);
+
+    // // Use the unmatched_detections indices to get a vector of just the unmatched new detections
+    // keep_indices(detections, unmatched_detections);
+
+    // // Use the unmatched_tracked indices to get a vector of only unmatched, previously tracked, but-not-yet-lost stracks
+    // keep_indices(strack_pool, unmatched_tracked);
 
 
 
