@@ -277,6 +277,7 @@ inline std::vector<STrack> JDETracker::update(std::vector<HailoDetectionPtr> &in
     std::vector<int> unmatched_tracked;        // Unmatched tracked stracks
     std::vector<int> unmatched_detections;     // Unmatched new detections
 
+	std::cout<<"Tracking Suraj new code" << std::endl;
     //******************************************************************
     // Step 1: Prepare tracks for new detections
     //******************************************************************
