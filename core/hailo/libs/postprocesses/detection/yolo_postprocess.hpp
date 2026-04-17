@@ -7,7 +7,7 @@
 #include "hailo_common.hpp"
 #include "yolo_output.hpp"
 #include "common/labels/coco_eighty.hpp"
-#incldue "common/labels/vast.hpp"
+#include "common/labels/vast.hpp"
 
 __BEGIN_DECLS
 
