@@ -239,7 +239,7 @@ extern "C" void *init(const char *config_path_cstr)
     }
 
     // --- open file ---
-    FILE *fp = fopen(config_path_cstr, "rb");
+    FILE *fp = fopen(config_path_cstr.c_str(), "rb");
     if (!fp) {
          std::cerr << "[custom_yolo4] Failed to open config: " << config_path_cstr << "\n";
         return params;
