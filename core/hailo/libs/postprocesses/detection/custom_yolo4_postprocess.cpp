@@ -230,7 +230,7 @@ namespace fs = std::experimental::filesystem;
 // ---------------------------------------------------------------------------
 // init() — called once by hailofilter to load params from JSON
 // ---------------------------------------------------------------------------
-extern "C" void *init(const char *config_path_cstr)
+extern "C" void *init(const std::string config_path)
 {
     CustomYolov4Params *params = new CustomYolov4Params();
 
