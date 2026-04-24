@@ -73,7 +73,7 @@ public:
 };
 
 YoloParams *init(std::string config_path, std::string func_name);
-extern "C" void *initi(const char *config_path, const char *func_name);
+// extern "C" void *initi(const char *config_path, const char *func_name);
 void free_resources(void *params_void_ptr);
 void filter(HailoROIPtr roi, void *params_void_ptr);
 void yolov5(HailoROIPtr roi, void *params_void_ptr);
