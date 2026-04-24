@@ -222,7 +222,7 @@ static void decode_head(HailoTensorPtr          tensor,
 // ---------------------------------------------------------------------------
 // init() — called once by hailofilter to load params from JSON
 // ---------------------------------------------------------------------------
-extern "C" void *init(const char *config_path_cstr, const char *func_name)
+extern "C" void *init(const char *config_path_cstr)
 {
     CustomYolov4Params *params = new CustomYolov4Params();
 
