@@ -144,6 +144,10 @@ static void decode_head(HailoTensorPtr          tensor,
     const int grid_w  = static_cast<int>(tensor->width());
     const int channels = static_cast<int>(tensor->features()); // should be 45
 
+
+    int total_candidates = 0;
+    int passed_obj = 0;
+    int passed_conf = 0;
     // -- quantization params from HailoRT --
     const float qp_scale = tensor->vstream_info().quant_info.qp_scale;
     const float qp_zp    = tensor->vstream_info().quant_info.qp_zp;
@@ -164,6 +168,16 @@ static void decode_head(HailoTensorPtr          tensor,
 
                 int offset = base + a * attrs_per_anchor;
 
+                if (gy == 0 && gx == 0) 
+                {
+                // int base = (gy * grid_w + gx) * channels + a * attrs_per_anchor;
+                fprintf(stderr, "[DEBUG] anchor=%d raw_obj_uint8=%d qp_scale=%f qp_zp=%f\n",
+                    a, data[offset + 4], qp_scale, qp_zp);
+                fprintf(stderr, "[DEBUG] dequant_obj=%f sigmoid_obj=%f\n",
+                    dequantize(data[offset+4], qp_scale, qp_zp),
+                    sigmoid(dequantize(data[offset+4], qp_scale, qp_zp)));
+                }
+
                 // --- dequantize raw values ---
                 float tx  = dequantize(data[offset + 0], qp_scale, qp_zp);
                 float ty  = dequantize(data[offset + 1], qp_scale, qp_zp);
@@ -171,7 +185,11 @@ static void decode_head(HailoTensorPtr          tensor,
                 float th  = dequantize(data[offset + 3], qp_scale, qp_zp);
                 float obj = dequantize(data[offset + 4], qp_scale, qp_zp);
 
+                
+
+                
                 float objectness = sigmoid(obj);
+                
                 if (objectness < params.detection_threshold) continue;
 
                 // --- class scores ---
@@ -186,6 +204,9 @@ static void decode_head(HailoTensorPtr          tensor,
                         best_class = c;
                     }
                 }
+
+                if (objectness > 0.01f) passed_obj++;
+                if (objectness * best_score > params.detection_threshold) passed_conf++;
 
                 float confidence = objectness * best_score;
                 if (confidence < params.detection_threshold) continue;
@@ -217,6 +238,9 @@ static void decode_head(HailoTensorPtr          tensor,
             }
         }
     }
+
+    fprintf(stderr, "[DEBUG] tensor H=%d W=%d total=%d passed_obj=%.01f passed_conf=%d\n",
+    grid_h, grid_w, total_candidates, passed_obj, passed_conf);
 }
 
 #if __GNUC__ > 8
