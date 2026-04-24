@@ -144,7 +144,7 @@ static void decode_head(HailoTensorPtr          tensor,
     const int grid_w  = static_cast<int>(tensor->width());
     const int channels = static_cast<int>(tensor->features()); // should be 45
 
-
+    
     int total_candidates = 0;
     int passed_obj = 0;
     int passed_conf = 0;
@@ -152,6 +152,9 @@ static void decode_head(HailoTensorPtr          tensor,
     const float qp_scale = tensor->vstream_info().quant_info.qp_scale;
     const float qp_zp    = tensor->vstream_info().quant_info.qp_zp;
 
+    fprintf(stderr, "[DEBUG] tensor=%s scale=%f zp=%f\n",
+        tensor->name().c_str(), qp_scale, qp_zp);
+    
     const int attrs_per_anchor = BBOX_ATTRS + params.num_classes;  // 15
     // channels == NUM_ANCHORS_PER_SCALE * attrs_per_anchor  (3*15=45) ✓
 
@@ -185,10 +188,12 @@ static void decode_head(HailoTensorPtr          tensor,
                 float th  = dequantize(data[offset + 3], qp_scale, qp_zp);
                 float obj = dequantize(data[offset + 4], qp_scale, qp_zp);
 
+                float raw_dequant = (float)data[offset+4] / 255.0f;  // simple normalize to [0,1]
+                float objectness = raw_dequant;
                 
 
                 
-                float objectness = sigmoid(obj);
+                // float objectness = sigmoid(obj);
                 
                 if (objectness < params.detection_threshold) continue;
 
