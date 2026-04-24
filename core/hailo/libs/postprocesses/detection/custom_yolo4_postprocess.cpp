@@ -219,6 +219,14 @@ static void decode_head(HailoTensorPtr          tensor,
     }
 }
 
+#if __GNUC__ > 8
+#include <filesystem>
+namespace fs = std::filesystem;
+#else
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#endif
+
 // ---------------------------------------------------------------------------
 // init() — called once by hailofilter to load params from JSON
 // ---------------------------------------------------------------------------
