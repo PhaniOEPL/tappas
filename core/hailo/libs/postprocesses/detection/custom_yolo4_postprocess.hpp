@@ -3,6 +3,7 @@
 #include "hailo_common.hpp"
 
 __BEGIN_DECLS
-void custom__yolov4(HailoROIPtr roi, void *params_void_ptr);
+void custom_yolov4(HailoROIPtr roi, void *params_void_ptr);
+extern "C" void *init(const char *config_path, const char *func_name);
 void filter(HailoROIPtr roi);
 __END_DECLS
