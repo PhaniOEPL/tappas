@@ -241,16 +241,16 @@ extern "C" void *init(const std::string config_path)
     for (int i = 0; i < params->num_classes; ++i)
         params->labels.push_back("class" + std::to_string(i));
 
-    if (config_path == nullptr || std::string(config_path).empty()) {
-        std::cerr << "[custom_yolo4] No config path provided, using defaults.\n";
-        return params;
-    }
+    // if (config_path == nullptr || std::string(config_path).empty()) {
+    //     std::cerr << "[custom_yolo4] No config path provided, using defaults.\n";
+    //     return params;
+    // }
 
     // --- open file ---
     FILE *fp = fopen(config_path.c_str(), "rb");
     if (!fp) {
          std::cerr << "[custom_yolo4] Failed to open config: " << config_path << "\n";
-        return params;
+        // return params;
     }
 
     // --- parse with rapidjson FileReadStream (exactly how TAPPAS does it) ---
