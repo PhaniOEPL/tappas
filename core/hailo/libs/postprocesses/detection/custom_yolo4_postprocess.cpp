@@ -160,7 +160,8 @@ static void decode_head(HailoTensorPtr          tensor,
 
     // Raw pointer to UINT8 data
     const uint8_t *data = tensor->data();
-
+    uint8_t max_obj_raw = 0;
+    int max_a = 0;
     for (int gy = 0; gy < grid_h; ++gy) {
         for (int gx = 0; gx < grid_w; ++gx) {
 
@@ -181,6 +182,13 @@ static void decode_head(HailoTensorPtr          tensor,
                     sigmoid(dequantize(data[offset+4], qp_scale, qp_zp)));
                 }
 
+
+                uint8_t obj_raw = data[offset + 4];
+                if (obj_raw > max_obj_raw) 
+                {
+                    max_obj_raw = obj_raw;
+                    max_gy = gy; max_gx = gx; max_a = a;
+                }
                 // --- dequantize raw values ---
                 float tx  = dequantize(data[offset + 0], qp_scale, qp_zp);
                 float ty  = dequantize(data[offset + 1], qp_scale, qp_zp);
@@ -243,7 +251,12 @@ static void decode_head(HailoTensorPtr          tensor,
             }
         }
     }
-
+    // Also print all channel values at that location
+    int best_base = (max_gy * grid_w + max_gx) * channels + max_a * attrs_per_anchor;
+    fprintf(stderr, "[DEBUG] best cell raw values: ");
+    for (int i = 0; i < attrs_per_anchor; i++)
+        fprintf(stderr, "%d ", data[best_base + i]);
+    fprintf(stderr, "\n");
     fprintf(stderr, "[DEBUG] tensor H=%d W=%d total=%d passed_obj=%.01f passed_conf=%d\n",
     grid_h, grid_w, total_candidates, passed_obj, passed_conf);
 }
