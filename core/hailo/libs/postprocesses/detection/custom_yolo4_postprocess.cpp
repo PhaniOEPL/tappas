@@ -161,7 +161,7 @@ static void decode_head(HailoTensorPtr          tensor,
     // Raw pointer to UINT8 data
     const uint8_t *data = tensor->data();
     uint8_t max_obj_raw = 0;
-    int max_a = 0;
+    int max_gy = 0, max_gx = 0, max_a = 0;
     for (int gy = 0; gy < grid_h; ++gy) {
         for (int gx = 0; gx < grid_w; ++gx) {
 
