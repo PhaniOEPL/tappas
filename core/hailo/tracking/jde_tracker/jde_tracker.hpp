@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021-2026 Hailo Technologies Ltd. All rights reserved.
+ * Copyright (c) 2021-2022 Hailo Technologies Ltd. All rights reserved.
  * Distributed under the LGPL license (https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)
  **/
 /*
@@ -15,6 +15,14 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+
+//shm include
+#include<stdio.h>
+#include<sys/ipc.h>
+#include<sys/shm.h>
+#include<sys/types.h>
+#include<errno.h>
+#include<stdlib.h>
 
 // Tappas includes
 #include "hailo_objects.hpp"
@@ -35,6 +43,31 @@
 #define DEFAULT_DEBUG (false)
 
 __BEGIN_DECLS
+
+struct ObjectTrackingResultsType  //nv-imx
+{
+   int cX;
+   int cY;
+   int width;
+   int height;
+   int classtype;
+   int trackID;
+};
+
+#define SHM_KEY 0x1234
+struct track_shmseg 
+{
+   ObjectTrackingResultsType _tracks[MAX_NUM_TRACKS];
+   unsigned int _numTracks=0;
+   unsigned int _model_input_size_x=640;
+   unsigned int _model_input_size_y=640;
+   unsigned int _keep_predict_frames=0;
+   float _predictable_region=0.9;
+   float _iou_scale_factor=0.1;
+   bool _iou_scale_enable=true;
+};
+
+
 class JDETracker
 {
     //******************************************************************
@@ -57,6 +90,9 @@ private:
     KalmanFilter m_kalman_filter;                          // Kalman Filter
     std::vector<hailo_object_t> m_hailo_objects_blacklist; // Objects that will never be kept track of
 
+    int m_track_shmid;		//shared memory id
+    struct track_shmseg *m_track_shmp;	//shared memory data
+
     //******************************************************************
     // CLASS RESOURCE MANAGEMENT
     //******************************************************************
@@ -72,12 +108,43 @@ public:
                                                                                                                                   m_keep_tracked_frames(keep_tracked), m_keep_new_frames(keep_new), m_keep_lost_frames(keep_lost),
                                                                                                                                   m_keep_past_metadata(keep_past_metadata), m_debug(debug), m_hailo_objects_blacklist(hailo_objects_blacklist_vec)
     {
+
+	printf("**************Hailo: nv-imx 1.3.4*****************\n");
+	printf("size==%d\n", (int)sizeof(track_shmseg));
         m_kalman_filter = KalmanFilter(std_weight_position, std_weight_position_box, std_weight_velocity, std_weight_velocity_box);
+
+	//Shared memory
+        m_track_shmid = shmget(SHM_KEY, sizeof(struct track_shmseg), 0644|IPC_CREAT);
+        if (m_track_shmid == -1) 
+	{
+            perror("JDETracker | Shared memory create error\n");
+        }
+
+        m_track_shmp = (track_shmseg*)shmat(m_track_shmid, NULL, 0);
+        
+	if (m_track_shmp == (void *) -1)
+        {
+            perror("JDETracker | Shared memory attach error\n");
+        }
+	else
+	{
+	    printf("JDETracker Shared memory attach success\n");
+	}
+	printf("HailoTracker: _model_input_size_x,_model_input_size_x:%d,%d\n",m_track_shmp->_model_input_size_x,m_track_shmp->_model_input_size_y);
+	printf("HailoTracker: _keep_predict_frames,_predictable_region:%d,%f\n",m_track_shmp->_keep_predict_frames,m_track_shmp->_predictable_region);
+	printf("HailoTracker:  _iou_scale_factor,_iou_scale_enable:%f,%d\n", m_track_shmp->_iou_scale_factor,(int)m_track_shmp->_iou_scale_enable);
     }
 
     // Destructor
-    ~JDETracker() = default;
-
+    //~JDETracker() = default;
+    ~JDETracker()
+    {
+	//detach shared memory
+        if (shmdt(m_track_shmp) == -1)
+        {
+            perror("JDETracker | Shared memory detach error\n");
+        }
+    }
     //******************************************************************
     // CLASS MEMBER ACCESS
     //******************************************************************
@@ -132,6 +199,7 @@ private:
 
     std::vector<std::vector<float>> iou_distance(std::vector<STrack *> &atracks, std::vector<STrack> &btracks);
     std::vector<std::vector<float>> iou_distance(std::vector<STrack> &atracks, std::vector<STrack> &btracks);
+    std::vector<std::vector<float>> iou_distance_custom(std::vector<STrack *> &atracks, std::vector<STrack> &btracks,float scale);
 
     std::vector<STrack *> joint_strack_pointers(std::vector<STrack *> &tlista, std::vector<STrack *> &tlistb);
     std::vector<STrack *> joint_strack_pointers(std::vector<STrack> &tlista, std::vector<STrack> &tlistb);
@@ -141,6 +209,7 @@ private:
 
     void embedding_distance(std::vector<STrack *> &tracks, std::vector<STrack> &detections, std::vector<std::vector<float>> &cost_matrix);
     void fuse_motion(std::vector<std::vector<float>> &cost_matrix, std::vector<STrack *> &tracks, std::vector<STrack> &detections, float lambda_);
+    void fuse_motion_custom(std::vector<std::vector<float>> &cost_matrix, std::vector<STrack *> &tracks, std::vector<STrack> &detections);
 };
 __END_DECLS
 
