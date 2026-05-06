@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021-2026 Hailo Technologies Ltd. All rights reserved.
+ * Copyright (c) 2021-2022 Hailo Technologies Ltd. All rights reserved.
  * Distributed under the LGPL license (https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt)
  **/
 /*
@@ -21,16 +21,18 @@
 // General includes
 #include "hailo_common.hpp"
 #include "hailo_objects.hpp"
-#include "opencv_utils.hpp"
 // Tracker includes
 #include "kalman_filter.hpp"
 #include "tracker_macros.hpp"
 
 // Open source includes
+#include <opencv2/opencv.hpp>
 #include "xtensor/xadapt.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xio.hpp"
 #include "xtensor/xmath.hpp"
+
+#define MAX_NUM_TRACKS 50
 
 __BEGIN_DECLS
 enum TrackState
@@ -57,6 +59,7 @@ public:
     // Class members
     bool m_is_activated; // Is activated
     int m_track_id;      // Unique track id
+    int m_class_id;      //class id
     int m_frame_id;      // Current frame id (used for measuring half-life)
     int m_tracklet_len;  // Number of frames since activation
     float m_confidence;  // Tracklet's score
@@ -83,10 +86,10 @@ private:
     //******************************************************************
 public:
     // Constructors
-    STrack(std::vector<float> tlwh_ = {0., 0., 0., 0.}, float score_ = 0.0, std::vector<float> temp_feat = {0.0},
+    STrack(std::vector<float> tlwh_ = {0., 0., 0., 0.}, float score_ = 0.0,int class_id=-1,std::vector<float> temp_feat = {0.0},
            HailoDetectionPtr detection_ptr = nullptr, int frame_id = 0,
            std::vector<hailo_object_t> hailo_objects_blacklist = {HAILO_LANDMARKS, HAILO_DEPTH_MASK, HAILO_CLASS_MASK}, bool debug = false) : m_is_activated(false), m_track_id(0), m_frame_id(frame_id), m_tracklet_len(0), m_confidence(score_),
-                                                                                                                                              m_start_frame(0), m_alpha(0.9), tmp_location_tlwh(tlwh_), m_state(TrackState::New),
+                                                                                                                                              m_class_id(class_id),m_start_frame(0), m_alpha(0.9), tmp_location_tlwh(tlwh_), m_state(TrackState::New),
                                                                                                                                               m_hailo_detection(detection_ptr), m_debug(debug)
     {
         m_times_seen = 0;
@@ -303,7 +306,7 @@ public:
      * @param kalman_filter  -  KalmanFilter
      *        The kalman filter with which to make the predictions.
      */
-    static void multi_predict(std::vector<STrack *> &stracks, KalmanFilter &kalman_filter)
+    static void multi_predict(std::vector<STrack *> &stracks, KalmanFilter &kalman_filter,int frame_id,int keep_predict_frames,float predict_limit)
     {
         for (uint i = 0; i < stracks.size(); i++)
         {
@@ -312,6 +315,22 @@ public:
                 stracks[i]->m_mean(7) = 0;
             }
             kalman_filter.predict(stracks[i]->m_mean, stracks[i]->m_covariance);
+
+            if( (frame_id - stracks[i]->end_frame()) < keep_predict_frames )
+	    {
+
+		std::vector<float> xyah= stracks[i]->to_xyah();
+
+ 		if( (xyah[0] < predict_limit) 
+		    && (xyah[0] > (1-predict_limit)) 
+                    && (xyah[1] < predict_limit) 
+                    && (xyah[1] > (1-predict_limit))
+                  )
+		{
+			stracks[i]->update_tlwh();
+		}
+	    }
+
         }
     }
 
@@ -436,7 +455,12 @@ private:
      */
     void update_features(std::vector<float> feat)
     {
-        OpenCVUtils::normalize(feat);
+        cv::Mat feat_mat(feat);
+        float feat_value = cv::norm(feat_mat);
+        for (uint i = 0; i < feat.size(); ++i)
+        {
+            feat[i] /= feat_value;
+        }
         this->m_curr_feat.assign(feat.begin(), feat.end());
         if (this->m_smooth_feat.size() == 0)
         {
@@ -450,7 +474,12 @@ private:
             }
         }
 
-        OpenCVUtils::normalize(this->m_smooth_feat);
+        cv::Mat smooth_feat_mat(this->m_smooth_feat);
+        float smmoth_feat_value = cv::norm(smooth_feat_mat);
+        for (uint i = 0; i < this->m_smooth_feat.size(); ++i)
+        {
+            this->m_smooth_feat[i] /= smmoth_feat_value;
+        }
     }
 };
 __END_DECLS
