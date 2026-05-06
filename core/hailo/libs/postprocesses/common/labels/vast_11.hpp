@@ -6,7 +6,7 @@
 #include <map>
 namespace common
 {
-    static std::map<uint8_t, std::string> vast = {
+    static std::map<uint8_t, std::string> vast_11 = {
         {0, "unlabeled"},
         {1, "bus"},  
 {2, "cab_trailer"},
