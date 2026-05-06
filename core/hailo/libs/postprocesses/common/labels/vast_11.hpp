@@ -9,11 +9,11 @@ namespace common
     static std::map<uint8_t, std::string> vast_11 = {
         {0, "unlabeled"},
         {1, "bus"},  
-{2, "cab_trailer"},
+        {2, "cab_trailer"},
         {3, "car"},
         {4, "fire_extinguisher"},
         {5, "forklift"},
-{6, "new_forklift"},
+        {6, "new_forklift"},
         {7, "person"},
         {8, "safety_helmet"},
         {9, "safety_jacket"},
