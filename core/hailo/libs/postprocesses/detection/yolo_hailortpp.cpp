@@ -12,12 +12,20 @@
 #include "common/labels/yolo_personface.hpp"
 #include "hailo_nms_decode.hpp"
 #include "yolo_hailortpp.hpp"
-
+#include "common/labels/nv_imx.hpp"
+#include "common/labels/nv_imx5.hpp"
+#include "common/labels/nv_imxDrone.hpp"
+#include "common/labels/vast.hpp"
+#include "common/labels/vast_11.hpp"
 static const std::string DEFAULT_YOLOV5S_OUTPUT_LAYER = "yolov5s_nv12/yolov5_nms_postprocess";
-static const std::string DEFAULT_YOLOV5M_OUTPUT_LAYER = "yolov5m_wo_spp/yolov5_nms_postprocess";
+static const std::string DEFAULT_YOLOV5M_OUTPUT_LAYER = "yolov5_nms_postprocess";
 static const std::string DEFAULT_YOLOV5M_VEHICLES_OUTPUT_LAYER = "yolov5m_vehicles/yolov5_nms_postprocess";
 static const std::string DEFAULT_YOLOV8S_OUTPUT_LAYER = "yolov8s/yolov8_nms_postprocess";
 static const std::string DEFAULT_YOLOV8M_OUTPUT_LAYER = "yolov8m/yolov8_nms_postprocess";
+static const std::string DEFAULT_YOLOV5M_8M_OUTPUT_LAYER = "nms_postprocess";
+static const std::string DEFAULT_YOLOV8L_OUTPUT_LAYER = "yolov8l/yolov8_nms_postprocess";
+static const std::string DEFAULT_YOLOV8_OUTPUT_LAYER = "yolo_v8/yolov8_nms_postprocess";
+static const std::string DEFAULT_YOLOV11_OUTPUT_LAYER = "yolo_v11/yolov11_nms_postprocess";
 
 #if __GNUC__ > 8
 #include <filesystem>
@@ -32,7 +40,13 @@ YoloParamsNMS *init(const std::string config_path, const std::string function_na
     YoloParamsNMS *params;
     if (!fs::exists(config_path))
     {
-        params = new YoloParamsNMS(common::coco_eighty);
+        printf("%s\n", function_name);
+        if (function_name == DEFAULT_YOLOV5M_OUTPUT_LAYER){
+        params = new YoloParamsNMS(common::nv_imx5);
+        }
+        else {
+            params = new YoloParamsNMS(common::nv_imx);
+        }
         return params;
     }
     else
@@ -107,16 +121,27 @@ static std::map<uint8_t, std::string> yolo_vehicles_labels = {
     {0, "unlabeled"},
     {1, "car"}};
 
+// void yolov5(HailoROIPtr roi)
+// {
+//     if (!roi->has_tensors())
+//     {
+//         return;
+//     }
+//     auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV5M_OUTPUT_LAYER), common::coco_eighty);
+//     auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
+//     hailo_common::add_detections(roi, detections);
+// }
+
+
 void yolov5(HailoROIPtr roi)
 {
-    if (!roi->has_tensors())
-    {
-        return;
-    }
-    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV5M_OUTPUT_LAYER), common::coco_eighty);
+
+    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV5M_OUTPUT_LAYER ), common::nv_imx5);
     auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
     hailo_common::add_detections(roi, detections);
 }
+
+
 
 void yolov5s_nv12(HailoROIPtr roi)
 {
@@ -135,22 +160,63 @@ void yolov8s(HailoROIPtr roi)
     {
         return;
     }
-    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8S_OUTPUT_LAYER), common::coco_eighty);
+    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8S_OUTPUT_LAYER), common::nv_imx);
     auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
     hailo_common::add_detections(roi, detections);
 }
+
+// void yolov8m(HailoROIPtr roi)
+// {
+//     if (!roi->has_tensors())
+//     {
+//         return;
+//     }
+//     auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8M_OUTPUT_LAYER), common::coco_eighty);
+//     auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
+//     hailo_common::add_detections(roi, detections);
+// }
+
+
 
 void yolov8m(HailoROIPtr roi)
 {
-    if (!roi->has_tensors())
-    {
-        return;
-    }
-    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8M_OUTPUT_LAYER), common::coco_eighty);
+    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8M_OUTPUT_LAYER), common::nv_imx);
+    auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
+    //    for (auto &detection : detections)
+    // {
+    //     auto detection_bbox = detection->get_bbox();
+    //     auto xmin = detection_bbox.xmin();
+    //     auto ymin = detection_bbox.ymin()*512/640;
+    //     auto xmax = detection_bbox.xmax();
+    //     auto ymax = detection_bbox.ymax()*512/640;
+
+    //     HailoBBox new_bbox(xmin, ymin, xmax - xmin, ymax - ymin);
+    //     detection->set_bbox(new_bbox);
+    // }
+    hailo_common::add_detections(roi, detections);
+}
+
+
+
+void yolov8l(HailoROIPtr roi)
+{
+    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8L_OUTPUT_LAYER), common::nv_imx);
     auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
     hailo_common::add_detections(roi, detections);
 }
 
+void yolo_v8(HailoROIPtr roi)
+{
+    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8_OUTPUT_LAYER), common::nv_imx);
+    auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
+    hailo_common::add_detections(roi, detections);
+}
+void yolo_v11(HailoROIPtr roi)
+{
+    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV11_OUTPUT_LAYER), common::vast_11);
+    auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
+    hailo_common::add_detections(roi, detections);
+}
 void yolox(HailoROIPtr roi)
 {
     if (!roi->has_tensors())
@@ -218,42 +284,54 @@ void yolov5_no_persons(HailoROIPtr roi)
 }
 void filter(HailoROIPtr roi, void *params_void_ptr)
 {
-    if (!roi->has_tensors())
-    {
-        return;
-    }
-    YoloParamsNMS *params = reinterpret_cast<YoloParamsNMS *>(params_void_ptr);
-    std::vector<HailoTensorPtr> tensors = roi->get_tensors();
-    // find the nms tensor
-    for (auto tensor : tensors)
-    {
-        if (std::regex_search(tensor->name(), std::regex("nms_postprocess"))) 
-        {
-            auto post = HailoNMSDecode(tensor, params->labels, params->detection_threshold, params->max_boxes, params->filter_by_score);
-            auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
-            hailo_common::add_detections(roi, detections);
-        }
-    }
+    // if (!roi->has_tensors())
+    // {
+    //     return;
+    // }
+    // YoloParamsNMS *params = reinterpret_cast<YoloParamsNMS *>(params_void_ptr);
+    // std::vector<HailoTensorPtr> tensors = roi->get_tensors();
+    // // find the nms tensor
+    // for (auto tensor : tensors)
+    // {
+    //     if (std::regex_search(tensor->name(), std::regex("nms_postprocess"))) 
+    //     {
+    //         auto post = HailoNMSDecode(tensor, params->labels, params->detection_threshold, params->max_boxes, params->filter_by_score);
+    //         auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
+    //         hailo_common::add_detections(roi, detections);
+    //     }
+    // }
+    yolov8m(roi);
 }
 void filter_letterbox(HailoROIPtr roi, void *params_void_ptr)
 {
     filter(roi, params_void_ptr);
     // Resize Letterbox
-    HailoBBox roi_bbox = hailo_common::create_flattened_bbox(roi->get_bbox(), roi->get_scaling_bbox());
-    auto detections = hailo_common::get_hailo_detections(roi);
-    for (auto &detection : detections)
-    {
-        auto detection_bbox = detection->get_bbox();
-        auto xmin = (detection_bbox.xmin() * roi_bbox.width()) + roi_bbox.xmin();
-        auto ymin = (detection_bbox.ymin() * roi_bbox.height()) + roi_bbox.ymin();
-        auto xmax = (detection_bbox.xmax() * roi_bbox.width()) + roi_bbox.xmin();
-        auto ymax = (detection_bbox.ymax() * roi_bbox.height()) + roi_bbox.ymin();
+    // HailoBBox roi_bbox = hailo_common::create_flattened_bbox(roi->get_bbox(), roi->get_scaling_bbox());
+    // auto detections = hailo_common::get_hailo_detections(roi);
+    // for (auto &detection : detections)
+    // {
+    //     auto detection_bbox = detection->get_bbox();
+    //     auto xmin = (detection_bbox.xmin() * roi_bbox.width()) + roi_bbox.xmin();
+    //     auto ymin = (detection_bbox.ymin() * roi_bbox.height()) + roi_bbox.ymin();
+    //     auto xmax = (detection_bbox.xmax() * roi_bbox.width()) + roi_bbox.xmin();
+    //     auto ymax = (detection_bbox.ymax() * roi_bbox.height()) + roi_bbox.ymin();
 
-        HailoBBox new_bbox(xmin, ymin, xmax - xmin, ymax - ymin);
-        detection->set_bbox(new_bbox);
-    }
+    //     HailoBBox new_bbox(xmin, ymin, xmax - xmin, ymax - ymin);
+    //     detection->set_bbox(new_bbox);
+    // }
+ // auto detections = hailo_common::get_hailo_detections(roi);
+ //    for (auto &detection : detections)
+ //    {
+ //        auto detection_bbox = detection->get_bbox();
+ //        auto xmin = detection_bbox.xmin();
+ //        auto ymin = detection_bbox.ymin()*512/640;
+ //        auto xmax = detection_bbox.xmax();
+ //        auto ymax = detection_bbox.ymax()*512/640;
 
-    // Clear the scaling bbox of main roi because all detections are fixed.
-    roi->clear_scaling_bbox();
+ //        HailoBBox new_bbox(xmin, ymin, xmax - xmin, ymax - ymin);
+ //        detection->set_bbox(new_bbox);
+ //    }
+    // // Clear the scaling bbox of main roi because all detections are fixed.
+    // roi->clear_scaling_bbox();
 
 }
