@@ -309,6 +309,22 @@ shared_library('face_recognition_post',
     install_dir: post_proc_install_dir,
 )
 
+##############################################################################
+# CUSTOM YOLOV4
+#############################################################################
+detection_custom_yolo4_post_sources = [
+  'detection/custom_yolo4_postprocess.cpp',
+]
+shared_library('custom_yolov4_post',
+    detection_custom_yolo4_post_sources,
+    include_directories: [hailo_general_inc, include_directories('detection')] + xtensor_inc+ rapidjson_inc,
+    dependencies: post_deps,
+    gnu_symbol_visibility : 'default',
+    cpp_args: hailo_lib_args,
+    install: true,
+    install_dir: post_proc_install_dir,
+)
+
 
 
 if get_option('include_python')
