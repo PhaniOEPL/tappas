@@ -25,7 +25,7 @@ static const std::string DEFAULT_YOLOV8M_OUTPUT_LAYER = "yolov8m/yolov8_nms_post
 static const std::string DEFAULT_YOLOV5M_8M_OUTPUT_LAYER = "nms_postprocess";
 static const std::string DEFAULT_YOLOV8L_OUTPUT_LAYER = "yolov8l/yolov8_nms_postprocess";
 static const std::string DEFAULT_YOLOV8_OUTPUT_LAYER = "yolo_v8/yolov8_nms_postprocess";
-static const std::string DEFAULT_YOLOV11_OUTPUT_LAYER = "yolo_v11/yolov11_nms_postprocess";
+static const std::string DEFAULT_YOLOV11_OUTPUT_LAYER = "yolov11m/yolov11_nms_postprocess";
 
 #if __GNUC__ > 8
 #include <filesystem>
