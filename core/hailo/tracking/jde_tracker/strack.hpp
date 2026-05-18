@@ -455,12 +455,9 @@ private:
      */
     void update_features(std::vector<float> feat)
     {
-        cv::Mat feat_mat(feat);
-        float feat_value = cv::norm(feat_mat);
-        for (uint i = 0; i < feat.size(); ++i)
-        {
-            feat[i] /= feat_value;
-        }
+       void update_features(std::vector<float> feat)
+    {
+        OpenCVUtils::normalize(feat);
         this->m_curr_feat.assign(feat.begin(), feat.end());
         if (this->m_smooth_feat.size() == 0)
         {
@@ -474,12 +471,8 @@ private:
             }
         }
 
-        cv::Mat smooth_feat_mat(this->m_smooth_feat);
-        float smmoth_feat_value = cv::norm(smooth_feat_mat);
-        for (uint i = 0; i < this->m_smooth_feat.size(); ++i)
-        {
-            this->m_smooth_feat[i] /= smmoth_feat_value;
-        }
+        OpenCVUtils::normalize(this->m_smooth_feat);
     }
+
 };
 __END_DECLS
