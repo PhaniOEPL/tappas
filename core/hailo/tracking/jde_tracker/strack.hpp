@@ -455,8 +455,7 @@ private:
      */
     void update_features(std::vector<float> feat)
     {
-       void update_features(std::vector<float> feat)
-    {
+
         OpenCVUtils::normalize(feat);
         this->m_curr_feat.assign(feat.begin(), feat.end());
         if (this->m_smooth_feat.size() == 0)
