@@ -107,7 +107,7 @@ private:
     float _detection_thr;
     uint _max_boxes;
     bool _filter_by_score;
-    const hailo_vstream_info_t _vstream_info;
+    // const hailo_vstream_info_t _vstream_info;
 	const hailo_tensor_nms_shape_t _nms_shape;
 
 
