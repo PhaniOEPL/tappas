@@ -27,6 +27,7 @@
 
 // Open source includes
 #include <opencv2/opencv.hpp>
+#include "opencv_utils.hpp"
 #include "xtensor/xadapt.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xio.hpp"
