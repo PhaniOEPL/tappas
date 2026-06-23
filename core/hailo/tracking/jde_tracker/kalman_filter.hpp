@@ -534,5 +534,55 @@ class KalmanFilter
         xt::xarray<float> square_mahalanobis = xt::sum(zz, {1});
         return square_mahalanobis;
     }
+
+    /**
+     * @brief Squared Mahalanobis gating distance on the CENTER (x, y) only.
+     *        Same idea as gating_distance() but restricted to the 2-D position
+     *        block of the projected state, so box shape (a, h) does NOT
+     *        contribute to the gate - that is left to the IOU cost, which
+     *        already penalises size mismatch. Use chi2inv95[2] as the threshold.
+     *
+     * @param mean  -  TrackerTypes::KAL_MEAN : <1x8>
+     *        Mean vector over the state distribution.
+     *
+     * @param covariance  -  TrackerTypes::KAL_COVA : <8x8>
+     *        Covariance of the state distribution.
+     *
+     * @param measurements  -  vector<TrackerTypes::DETECTBOX> : vector<<1x4>>
+     *        N measurements in (x, y, a, h) format; only (x, y) is used.
+     *
+     * @return xt::xarray<float> : length N
+     *         The i-th element is the squared Mahalanobis distance over (x, y)
+     *         between (mean, covariance) and measurements[i].
+     */
+    xt::xarray<float> gating_distance_xy(const TrackerTypes::KAL_MEAN &mean,
+                                         const TrackerTypes::KAL_COVA &covariance,
+                                         const std::vector<TrackerTypes::DETECTBOX> &measurements)
+    {
+        // Project the state to measurement space (x, y, a, h) with its noise.
+        TrackerTypes::KAL_HDATA projection_results = project(mean, covariance);
+        TrackerTypes::KAL_HMEAN mean1 = projection_results.first;
+        TrackerTypes::KAL_HCOVA covariance1 = projection_results.second;
+
+        // Take only the 2x2 position block S = [[sxx, sxy], [syx, syy]].
+        float sxx = covariance1(0, 0);
+        float sxy = covariance1(0, 1);
+        float syx = covariance1(1, 0);
+        float syy = covariance1(1, 1);
+        float det = sxx * syy - sxy * syx;
+
+        xt::xarray<float> square_mahalanobis = xt::zeros<float>({(int)measurements.size()});
+        if (det <= 0.0f) // Degenerate covariance: don't gate (zeros always pass).
+            return square_mahalanobis;
+
+        for (uint i = 0; i < measurements.size(); ++i)
+        {
+            float dx = measurements[i](0, 0) - mean1(0, 0);
+            float dy = measurements[i](0, 1) - mean1(0, 1);
+            // r^T S^-1 r, with S^-1 = (1/det) [[syy, -sxy], [-syx, sxx]].
+            square_mahalanobis(i) = (syy * dx * dx - (sxy + syx) * dx * dy + sxx * dy * dy) / det;
+        }
+        return square_mahalanobis;
+    }
 };
 __END_DECLS
