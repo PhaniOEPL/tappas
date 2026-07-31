@@ -146,23 +146,31 @@ inline void JDETracker::fuse_motion(std::vector<std::vector<float>> &cost_matrix
  *
  * @param detections  -  std::vector<STrack>
  *        The newly detected STracks (columns of the cost matrix).
+ *
+ * @param gating_scale  -  float
+ *        Multiplier on the chi-square motion gate. 1.0 is the textbook gate;
+ *        larger values loosen it. The step-3.2 extended-IOU pass must pass a
+ *        looser value (EXTENDED_IOU_GATING_SCALE) - that pass exists to recover
+ *        large motion, so a textbook gate there would veto the very matches it
+ *        is meant to rescue.
  */
 inline void JDETracker::fuse_motion_custom(std::vector<std::vector<float>> &cost_matrix,
                                     std::vector<STrack*> &tracks,
-                                    std::vector<STrack> &detections)
+                                    std::vector<STrack> &detections,
+                                    float gating_scale)
 {
     if (cost_matrix.size() == 0)
         return;
 
     // Motion gate threshold: 0.95 quantile of chi-square with 2 DOF (x, y).
     // We gate on the box CENTER only; box size (a, h) is left to the IOU cost,
-    // which already penalises size mismatch. gating_scale loosens (>1) or
-    // tightens (<1) the gate. NOTE: this fork uses very small KF std weights, so
-    // the strict (1.0) gate can be aggressive and may reject legitimate fast
-    // motion (esp. in the step-3.2 extended-IOU pass). Tune up if you see tracks
-    // fragmenting; consider exposing this via the shm knobs (track_shmseg).
+    // which already penalises size mismatch. NOTE: this fork uses very small KF
+    // std weights, so the strict (1.0) gate can be aggressive - in particular a
+    // track that has been stationary has near-zero velocity AND near-zero
+    // covariance, so the frame the object starts moving the residual can exceed
+    // the gate and spawn a duplicate track. Raise DEFAULT_GATING_SCALE if you
+    // see that; consider exposing it via the shm knobs (track_shmseg).
     const int gating_dim = 2;
-    const float gating_scale = 1.0f;
     const float gating_threshold = gating_scale * this->m_kalman_filter.chi2inv95[gating_dim];
 
     // Build the (x, y, a, h) measurement set from the current detections once.
