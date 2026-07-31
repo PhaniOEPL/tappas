@@ -34,6 +34,13 @@
 #define DEFAULT_KALMAN_DISTANCE (0.7f)
 #define DEFAULT_IOU_THRESHOLD (0.8f)
 #define DEFAULT_INIT_IOU_THRESHOLD (0.9f)
+// Multipliers on the chi-square 0.95 motion gate used by fuse_motion_custom.
+// 1.0 is the textbook gate. The extended-IOU pass (step 3.2) exists precisely to
+// recover large/fast motion, so a textbook gate there fights its purpose - it is
+// given a deliberately looser value. Mahalanobis is a SQUARED distance, so a
+// scale of 4.0 admits ~2x the positional deviation, not 4x.
+#define DEFAULT_GATING_SCALE (1.0f)
+#define EXTENDED_IOU_GATING_SCALE (4.0f)
 #define DEFAULT_KEEP_FRAMES (2)
 #define DEFAULT_KEEP_PAST_METADATA (true)
 #define DEFAULT_STD_WEIGHT_POSITION (0.01)
@@ -206,10 +213,11 @@ private:
     std::vector<STrack> joint_stracks(std::vector<STrack> &tlista, std::vector<STrack> &tlistb);
     std::vector<STrack> sub_stracks(std::vector<STrack> &tlista, std::vector<STrack> &tlistb);
     void remove_duplicate_stracks(std::vector<STrack> &stracksa, std::vector<STrack> &stracksb);
+    void remove_duplicate_new_stracks(std::vector<STrack> &new_stracks, std::vector<STrack> &confirmed_stracks);
 
     void embedding_distance(std::vector<STrack *> &tracks, std::vector<STrack> &detections, std::vector<std::vector<float>> &cost_matrix);
     void fuse_motion(std::vector<std::vector<float>> &cost_matrix, std::vector<STrack *> &tracks, std::vector<STrack> &detections, float lambda_);
-    void fuse_motion_custom(std::vector<std::vector<float>> &cost_matrix, std::vector<STrack *> &tracks, std::vector<STrack> &detections);
+    void fuse_motion_custom(std::vector<std::vector<float>> &cost_matrix, std::vector<STrack *> &tracks, std::vector<STrack> &detections, float gating_scale = DEFAULT_GATING_SCALE);
 };
 __END_DECLS
 
