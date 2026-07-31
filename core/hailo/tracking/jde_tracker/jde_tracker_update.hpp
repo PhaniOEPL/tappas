@@ -291,20 +291,20 @@ inline std::vector<STrack> JDETracker::update(std::vector<HailoDetectionPtr> &in
     // Step 2: First association, tracked with embedding
     //******************************************************************
     // Calculate the distances between the tracked/lost stracks and the newly detected inputs
-    // embedding_distance(strack_pool, detections, distances); // Calculate the distances
-    // fuse_motion(distances, strack_pool, detections);        // Create the cost matrix
+    //embedding_distance(strack_pool, detections, distances); // Calculate the distances
+    //fuse_motion(distances, strack_pool, detections);        // Create the cost matrix
 
-    // // Use linear assignment to find matches
-    // linear_assignment(distances, strack_pool.size(), detections.size(), this->m_kalman_dist_thr, matches, unmatched_tracked, unmatched_detections);
+    // Use linear assignment to find matches
+    //linear_assignment(distances, strack_pool.size(), detections.size(), this->m_kalman_dist_thr, matches, unmatched_tracked, unmatched_detections);
 
-    // // Update the matches
-    // update_matches(matches, strack_pool, detections, activated_stracks);
+    // Update the matches
+    //update_matches(matches, strack_pool, detections, activated_stracks);
 
-    // // Use the unmatched_detections indices to get a vector of just the unmatched new detections
-    // keep_indices(detections, unmatched_detections);
+    // Use the unmatched_detections indices to get a vector of just the unmatched new detections
+    //keep_indices(detections, unmatched_detections);
 
-    // // Use the unmatched_tracked indices to get a vector of only unmatched, previously tracked, but-not-yet-lost stracks
-    // keep_indices(strack_pool, unmatched_tracked);
+    // Use the unmatched_tracked indices to get a vector of only unmatched, previously tracked, but-not-yet-lost stracks
+    //keep_indices(strack_pool, unmatched_tracked);
 
 
 
@@ -340,7 +340,9 @@ inline std::vector<STrack> JDETracker::update(std::vector<HailoDetectionPtr> &in
     {
     	// calculate the iou distance of what's left
     	distances = iou_distance_custom(strack_pool, detections, m_track_shmp->_iou_scale_factor);
-    	fuse_motion_custom(distances, strack_pool, detections);
+    	// Looser motion gate here: this pass exists to recover large/fast motion,
+    	// so the textbook gate used in step 3.1 would veto exactly what it rescues.
+    	fuse_motion_custom(distances, strack_pool, detections, EXTENDED_IOU_GATING_SCALE);
 
 
     	// Recalculate the linear assignment, this time use the iou threshold
@@ -403,6 +405,18 @@ inline std::vector<STrack> JDETracker::update(std::vector<HailoDetectionPtr> &in
     this->m_tracked_stracks = activated_stracks;
     this->m_lost_stracks = lost_stracks;
     this->m_new_stracks = new_stracks;
+
+    // Duplicate suppression. Without this, an object that briefly fails to
+    // associate (e.g. a stationary track the frame its subject starts moving)
+    // spawns a second track while the original keeps coasting, and BOTH stay
+    // alive for their full keep_*_frames lifetime - the object visibly holds two
+    // ids until the older one reclaims the detection and the newer one starves.
+    // Upstream JDE/ByteTrack runs this every frame; this fork had dropped it.
+    remove_duplicate_stracks(this->m_tracked_stracks, this->m_lost_stracks);
+    // New stracks are deduplicated against the tracked set ONLY, never against
+    // the lost set: a lost track is not published, so suppressing a new strack
+    // that overlaps one would leave the object with no reported box at all.
+    remove_duplicate_new_stracks(this->m_new_stracks, this->m_tracked_stracks);
 
     //******************************************************************
     // Step 7: Set the output stracks
