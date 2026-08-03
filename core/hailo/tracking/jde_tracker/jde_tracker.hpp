@@ -35,12 +35,27 @@
 #define DEFAULT_IOU_THRESHOLD (0.8f)
 #define DEFAULT_INIT_IOU_THRESHOLD (0.9f)
 // Multipliers on the chi-square 0.95 motion gate used by fuse_motion_custom.
-// 1.0 is the textbook gate. The extended-IOU pass (step 3.2) exists precisely to
-// recover large/fast motion, so a textbook gate there fights its purpose - it is
-// given a deliberately looser value. Mahalanobis is a SQUARED distance, so a
-// scale of 4.0 admits ~2x the positional deviation, not 4x.
-#define DEFAULT_GATING_SCALE (1.0f)
-#define EXTENDED_IOU_GATING_SCALE (4.0f)
+// Mahalanobis is a SQUARED distance, so these scale the admissible displacement
+// by their square root - 25.0 admits 5x the deviation, not 25x.
+//
+// Why 25 and not the textbook 1.0: this tracker runs std_weight_position = 0.01,
+// which is 5x tighter than the 1/20 used by DeepSORT and the rest of the SORT
+// family. Working the projected innovation std through project(), a scale of 1.0
+// admits only ~0.035 * h of unexplained displacement per frame - i.e. 3.5% of the
+// object's OWN HEIGHT. A person walking normally at 25fps covers 2-8% of their
+// body height per frame, so the textbook gate is tighter than a walking pace: the
+// frame a stationary track's subject starts moving, its (near-zero) velocity means
+// the whole displacement is residual, the correct detection is vetoed, and a
+// duplicate track is born. Scale 25 restores parity with DeepSORT's effective gate
+// (~0.17 * h) precisely because variance scales with the square of the std weight.
+//
+// If std_weight_position is ever retuned, rescale these by (0.01 / new_value)^2
+// to hold the gate's physical width constant.
+#define DEFAULT_GATING_SCALE (25.0f)
+// The extended-IOU pass (step 3.2) exists to recover large/fast motion, so a gate
+// sized for ordinary motion fights its purpose. 100 gives it ~2x the displacement
+// budget of the primary pass.
+#define EXTENDED_IOU_GATING_SCALE (100.0f)
 #define DEFAULT_KEEP_FRAMES (2)
 #define DEFAULT_KEEP_PAST_METADATA (true)
 #define DEFAULT_STD_WEIGHT_POSITION (0.01)
