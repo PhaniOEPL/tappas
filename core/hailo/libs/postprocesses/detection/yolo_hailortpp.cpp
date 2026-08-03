@@ -160,7 +160,9 @@ void yolov8s(HailoROIPtr roi)
     {
         return;
     }
-    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8S_OUTPUT_LAYER), common::nv_imx);
+    // auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8S_OUTPUT_LAYER), common::nv_imx);
+    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8S_OUTPUT_LAYER), common::nv_imx,
+                               DEFAULT_THRESHOLD, DEFAULT_MAX_BOXES, false, common::nv_imx_class_merge);
     auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
     hailo_common::add_detections(roi, detections);
 }
@@ -180,7 +182,9 @@ void yolov8s(HailoROIPtr roi)
 
 void yolov8m(HailoROIPtr roi)
 {
-    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8M_OUTPUT_LAYER), common::nv_imx);
+    // auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8M_OUTPUT_LAYER), common::nv_imx);
+    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8M_OUTPUT_LAYER), common::nv_imx,
+                               DEFAULT_THRESHOLD, DEFAULT_MAX_BOXES, false, common::nv_imx_class_merge);
     auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
     //    for (auto &detection : detections)
     // {
@@ -200,21 +204,27 @@ void yolov8m(HailoROIPtr roi)
 
 void yolov8l(HailoROIPtr roi)
 {
-    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8L_OUTPUT_LAYER), common::nv_imx);
+    // auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8L_OUTPUT_LAYER), common::nv_imx);
+    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8L_OUTPUT_LAYER), common::nv_imx,
+                               DEFAULT_THRESHOLD, DEFAULT_MAX_BOXES, false, common::nv_imx_class_merge);
     auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
     hailo_common::add_detections(roi, detections);
 }
 
 void yolo_v8(HailoROIPtr roi)
 {
-    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8_OUTPUT_LAYER), common::nv_imx);
+    // auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8_OUTPUT_LAYER), common::nv_imx);
+    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV8_OUTPUT_LAYER), common::nv_imx,
+                               DEFAULT_THRESHOLD, DEFAULT_MAX_BOXES, false, common::nv_imx_class_merge);
     auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
     hailo_common::add_detections(roi, detections);
 }
 
 void yolov9(HailoROIPtr roi)
 {
-    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV9_OUTPUT_LAYER), common::nv_imx);
+    // auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV9_OUTPUT_LAYER), common::nv_imx);
+    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOV9_OUTPUT_LAYER), common::nv_imx,
+                               DEFAULT_THRESHOLD, DEFAULT_MAX_BOXES, false, common::nv_imx_class_merge);
     auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
     hailo_common::add_detections(roi, detections);
 }
@@ -225,7 +235,9 @@ void yolox(HailoROIPtr roi)
     {
         return;
     }
-    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOX_OUTPUT_LAYER), common::nv_imx);
+    // auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOX_OUTPUT_LAYER), common::nv_imx);
+    auto post = HailoNMSDecode(roi->get_tensor(DEFAULT_YOLOX_OUTPUT_LAYER), common::nv_imx,
+                               DEFAULT_THRESHOLD, DEFAULT_MAX_BOXES, false, common::nv_imx_class_merge);
     auto detections = post.decode<float32_t, common::hailo_bbox_float32_t>();
     hailo_common::add_detections(roi, detections);
 }
