@@ -162,14 +162,15 @@ inline void JDETracker::fuse_motion_custom(std::vector<std::vector<float>> &cost
     if (cost_matrix.size() == 0)
         return;
 
-    // Motion gate threshold: 0.95 quantile of chi-square with 2 DOF (x, y).
-    // We gate on the box CENTER only; box size (a, h) is left to the IOU cost,
-    // which already penalises size mismatch. NOTE: this fork uses very small KF
-    // std weights, so the strict (1.0) gate can be aggressive - in particular a
-    // track that has been stationary has near-zero velocity AND near-zero
-    // covariance, so the frame the object starts moving the residual can exceed
-    // the gate and spawn a duplicate track. Raise DEFAULT_GATING_SCALE if you
-    // see that; consider exposing it via the shm knobs (track_shmseg).
+    // Motion gate threshold: 0.95 quantile of chi-square with 2 DOF (x, y),
+    // widened by gating_scale. We gate on the box CENTER only; box size (a, h) is
+    // left to the IOU cost, which already penalises size mismatch - gating on both
+    // would count the same evidence twice.
+    //
+    // The scale is NOT 1.0 - see DEFAULT_GATING_SCALE in jde_tracker.hpp for why
+    // this tracker's tight std weights make the textbook gate narrower than a
+    // walking pace. Consider exposing the scale via the shm knobs (track_shmseg)
+    // so it can move with the operator-selected motion profile.
     const int gating_dim = 2;
     const float gating_threshold = gating_scale * this->m_kalman_filter.chi2inv95[gating_dim];
 
