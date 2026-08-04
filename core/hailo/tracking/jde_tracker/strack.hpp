@@ -23,6 +23,7 @@
 #include "hailo_objects.hpp"
 // Tracker includes
 #include "kalman_filter.hpp"
+#include "class_policy.hpp"
 #include "tracker_macros.hpp"
 
 // Open source includes
@@ -59,7 +60,8 @@ public:
     // Class members
     bool m_is_activated; // Is activated
     int m_track_id;      // Unique track id
-    int m_class_id;      //class id
+    int m_class_id;      //class id - the VOTED class (argmax of m_class_scores), not the latest detection's label
+    std::map<int, float> m_class_scores; // accumulated per-class evidence, decayed each observation
     int m_frame_id;      // Current frame id (used for measuring half-life)
     int m_tracklet_len;  // Number of frames since activation
     float m_confidence;  // Tracklet's score
@@ -93,6 +95,10 @@ public:
                                                                                                                                               m_hailo_detection(detection_ptr), m_debug(debug)
     {
         m_times_seen = 0;
+        // Seed the class vote with this observation so a track created from a
+        // detection starts with evidence for the class it was created as.
+        if (class_id >= 0)
+            m_class_scores[class_id] = (score_ > 0.0f) ? score_ : 1.0f;
         // Initialize mean/covariance to zero
         m_mean = xt::zeros<float>({1, 8});
         m_covariance = xt::zeros<float>({8, 8});
@@ -152,6 +158,61 @@ public:
     void add_object(HailoObjectPtr obj)
     {
         this->m_hailo_detection->add_object(obj);
+    }
+
+    /**
+     * @brief Fold one observed class label into this track's accumulated class
+     *        evidence, then re-derive m_class_id from it.
+     *
+     *        Called once per successful match. Unmatched frames deliberately do
+     *        NOT decay - a coasting track should not lose confidence in what it
+     *        is just because the detector missed it.
+     *
+     *        The label only moves when a challenger beats the incumbent by
+     *        class_switch_margin(), which is deliberately larger for sticky
+     *        classes. See class_policy.hpp for the reasoning and the constants.
+     *
+     * @param class_id  -  int
+     *        The class the matched detection was labelled with. Negative ids are
+     *        treated as "no opinion" and only decay the existing evidence.
+     *
+     * @param confidence  -  float
+     *        The detection's confidence, used as the vote weight, so a hesitant
+     *        label counts for less than a confident one.
+     */
+    void vote_class(int class_id, float confidence)
+    {
+        for (auto &score : m_class_scores)
+            score.second *= CLASS_VOTE_DECAY;
+
+        if (class_id < 0)
+            return;
+
+        m_class_scores[class_id] += (confidence > 0.0f) ? confidence : 1.0f;
+
+        // Score of the label currently being reported.
+        float incumbent_score = 0.0f;
+        auto incumbent = m_class_scores.find(this->m_class_id);
+        if (incumbent != m_class_scores.end())
+            incumbent_score = incumbent->second;
+
+        // Strongest class other than the incumbent.
+        int challenger = this->m_class_id;
+        float challenger_score = 0.0f;
+        for (const auto &score : m_class_scores)
+        {
+            if (score.first != this->m_class_id && score.second > challenger_score)
+            {
+                challenger = score.first;
+                challenger_score = score.second;
+            }
+        }
+
+        if (challenger != this->m_class_id &&
+            challenger_score > incumbent_score * class_switch_margin(this->m_class_id))
+        {
+            this->m_class_id = challenger;
+        }
     }
 
     /**
@@ -395,6 +456,9 @@ public:
         update_tlwh();
 
         update_features(new_track.m_curr_feat);
+        // Fold the matched detection's label into the class vote. Does NOT
+        // blindly adopt it - see vote_class().
+        vote_class(new_track.m_class_id, new_track.m_confidence);
         this->m_tracklet_len = 0;
         this->m_state = TrackState::Tracked;
         this->m_is_activated = true;
@@ -438,6 +502,9 @@ public:
         this->m_is_activated = true;
 
         this->m_confidence = new_track.m_confidence;
+        // Fold the matched detection's label into the class vote. Does NOT
+        // blindly adopt it - see vote_class().
+        vote_class(new_track.m_class_id, new_track.m_confidence);
         if (update_feature)
             update_features(new_track.m_curr_feat);
 
