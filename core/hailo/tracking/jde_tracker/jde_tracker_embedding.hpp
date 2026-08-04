@@ -200,11 +200,21 @@ inline void JDETracker::fuse_motion_custom(std::vector<std::vector<float>> &cost
 
         for (uint j = 0; j < cost_matrix[i].size(); j++)
         {
-            // 1) Class gate.
+            // 1) Class gate - graded, not absolute.
+            //    Unrelated classes are vetoed outright (a person track must never
+            //    absorb a car detection). Classes the detector is KNOWN to confuse
+            //    are only penalised, so a track with overwhelming geometric
+            //    evidence can still claim the detection despite the label
+            //    disagreeing. See class_policy.hpp.
             if (tracks[i]->m_class_id != detections[j].m_class_id)
             {
-                cost_matrix[i][j] = FLT_MAX;
-                continue;
+                if (!classes_are_confusable(tracks[i]->m_class_id, detections[j].m_class_id))
+                {
+                    cost_matrix[i][j] = FLT_MAX;
+                    continue;
+                }
+
+                cost_matrix[i][j] += CLASS_MISMATCH_PENALTY;
             }
 
             // 2) Motion gate (only when the track has a valid Kalman state).
