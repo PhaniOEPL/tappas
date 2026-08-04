@@ -171,11 +171,14 @@ inline void JDETracker::remove_duplicate_stracks(std::vector<STrack> &stracksa, 
     {
         for (uint j = 0; j < pdist[i].size(); j++)
         {
-            // Never treat tracks of different classes as duplicates of each
-            // other - the whole association path enforces class consistency,
-            // and silently deleting a valid track of another class would be a
-            // far worse failure than leaving two boxes overlapping.
-            if (stracksa[i].m_class_id != stracksb[j].m_class_id)
+            // Never treat tracks of unrelated classes as duplicates of each
+            // other - silently deleting a valid track of another class would be
+            // a far worse failure than leaving two boxes overlapping. Classes
+            // the detector is known to confuse ARE allowed to suppress each
+            // other: at this overlap they are the same object wearing two
+            // labels, which is the duplicate this exists to remove.
+            if (stracksa[i].m_class_id != stracksb[j].m_class_id &&
+                !classes_are_confusable(stracksa[i].m_class_id, stracksb[j].m_class_id))
                 continue;
 
             if (pdist[i][j] < IOU_THRESHOLD)
@@ -280,7 +283,10 @@ inline void JDETracker::remove_duplicate_new_stracks(std::vector<STrack> &new_st
         bool is_duplicate = false;
         for (uint j = 0; j < confirmed_stracks.size(); j++)
         {
-            if (new_stracks[i].m_class_id != confirmed_stracks[j].m_class_id)
+            // Unrelated classes never suppress each other; known-confusable ones
+            // do. See remove_duplicate_stracks for the reasoning.
+            if (new_stracks[i].m_class_id != confirmed_stracks[j].m_class_id &&
+                !classes_are_confusable(new_stracks[i].m_class_id, confirmed_stracks[j].m_class_id))
                 continue;
 
             if (pdist[i][j] < IOU_THRESHOLD)
