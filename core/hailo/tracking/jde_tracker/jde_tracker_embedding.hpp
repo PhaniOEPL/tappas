@@ -198,6 +198,35 @@ inline void JDETracker::fuse_motion_custom(std::vector<std::vector<float>> &cost
                                                                        measurements);
         }
 
+        // Motion context for the direction-consistency cost.
+        float velocity_x = 0.0f, velocity_y = 0.0f, speed = 0.0f;
+        float anchor_x = 0.0f, anchor_y = 0.0f;
+        float direction_weight = 0.0f;
+        if (has_motion_state)
+        {
+            velocity_x = tracks[i]->m_mean(4);
+            velocity_y = tracks[i]->m_mean(5);
+            speed = std::sqrt((velocity_x * velocity_x) + (velocity_y * velocity_y));
+
+            // multi_predict has ALREADY advanced the state this frame, so the
+            // predicted centre is not a usable anchor - the displacement to it is
+            // just the residual, which is ~0 for a well-tracked object and carries
+            // no direction. Step back one velocity increment to recover where the
+            // track was before the prediction, and measure displacement from there.
+            anchor_x = tracks[i]->m_mean(0) - velocity_x;
+            anchor_y = tracks[i]->m_mean(1) - velocity_y;
+
+            // Ramp the penalty in by speed, in box-heights per frame.
+            float height = tracks[i]->m_mean(3);
+            if (height > 0.0f)
+            {
+                float speed_ratio = speed / height;
+                direction_weight = (speed_ratio - DIRECTION_MIN_SPEED_RATIO) /
+                                   (DIRECTION_FULL_SPEED_RATIO - DIRECTION_MIN_SPEED_RATIO);
+                direction_weight = std::max(0.0f, std::min(1.0f, direction_weight));
+            }
+        }
+
         for (uint j = 0; j < cost_matrix[i].size(); j++)
         {
             // 1) Class gate - graded, not absolute.
@@ -221,6 +250,30 @@ inline void JDETracker::fuse_motion_custom(std::vector<std::vector<float>> &cost
             if (has_motion_state && gating_distance[j] > gating_threshold)
             {
                 cost_matrix[i][j] = FLT_MAX;
+                continue;
+            }
+
+            // 3) Direction-consistency cost. Soft, speed-weighted, and applied
+            //    only to matches that survived both gates. Penalises a candidate
+            //    whose implied displacement contradicts the track's heading, which
+            //    is what separates two same-class objects crossing when position
+            //    and IOU have both gone uninformative. Note this only needs to
+            //    make the WRONG pairing dearer than the right one - the assignment
+            //    solver does the rest - so it breaks ties rather than vetoing.
+            if (direction_weight > 0.0f && speed > 0.0f)
+            {
+                float dx = measurements[j](0, 0) - anchor_x;
+                float dy = measurements[j](0, 1) - anchor_y;
+                float displacement = std::sqrt((dx * dx) + (dy * dy));
+
+                if (displacement > 0.0f)
+                {
+                    // +1 continues the heading, -1 reverses it.
+                    float cosine = ((dx * velocity_x) + (dy * velocity_y)) / (displacement * speed);
+                    // Remap to 0 (agrees) .. 1 (fully reversed).
+                    float disagreement = (1.0f - cosine) * 0.5f;
+                    cost_matrix[i][j] += DIRECTION_COST_WEIGHT * direction_weight * disagreement;
+                }
             }
         }
     }
