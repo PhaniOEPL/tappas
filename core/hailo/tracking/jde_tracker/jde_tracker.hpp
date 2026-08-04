@@ -56,6 +56,36 @@
 // sized for ordinary motion fights its purpose. 100 gives it ~2x the displacement
 // budget of the primary pass.
 #define EXTENDED_IOU_GATING_SCALE (100.0f)
+// ---------------------------------------------------------------------------
+// Direction-consistency cost (OC-SORT style)
+// ---------------------------------------------------------------------------
+// The Mahalanobis gate is computed in MEASUREMENT space, which contains only
+// (x, y, a, h) - a detection reports a box, never a motion - so velocity can
+// never appear in the residual. That is why the gate cannot separate two
+// same-class objects crossing: at closest approach each detection sits inside
+// BOTH tracks' gates and every positional signal ties.
+//
+// Direction is the signal that stays sharp exactly there: the correct detection
+// continues the track's established heading (cosine ~ +1) while the swapped one
+// implies a reversal (cosine ~ -1). This adds a SOFT cost for that disagreement.
+// It is deliberately not a gate - a real reversal must stay matchable.
+//
+// Max penalty for a fully reversed match. Sized like CLASS_MISMATCH_PENALTY: big
+// enough to break a tie between two otherwise-equal candidates, small enough that
+// a genuine turn (which keeps very high IOU, so a very low base cost) still lands
+// under the match threshold.
+#define DIRECTION_COST_WEIGHT (0.3f)
+
+// Direction is meaningless at low speed, and a turning object decelerates before
+// it reverses - so the penalty is ramped in by speed, measured in box-heights per
+// frame to stay resolution- and distance-independent. Below MIN the penalty is
+// zero; above FULL it is at full weight; linear between. The 0.02-0.08 band is
+// taken from ordinary walking at 60fps (2-8% of body height per frame), so a
+// person turning on the spot is never penalised while one walking through a
+// crossing is.
+#define DIRECTION_MIN_SPEED_RATIO (0.02f)
+#define DIRECTION_FULL_SPEED_RATIO (0.08f)
+
 #define DEFAULT_KEEP_FRAMES (2)
 #define DEFAULT_KEEP_PAST_METADATA (true)
 #define DEFAULT_STD_WEIGHT_POSITION (0.01)
