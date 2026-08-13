@@ -7,6 +7,8 @@
 // General cpp includes
 #include <algorithm>
 #include <cmath>
+#include <cstdio>
+#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -441,6 +443,58 @@ inline std::vector<STrack> JDETracker::update(std::vector<HailoDetectionPtr> &in
 
     //update no of active tracks
     m_track_shmp->_numTracks=output_stracks.size();
+
+    // -----------------------------------------------------------------------
+    // Diagnostic track log - OPT-IN, off unless the env var is set.
+    //
+    //     HAILO_TRACK_LOG=/tmp/tracks.csv <however the pipeline is launched>
+    //
+    // Written from the tracker (not the consumer app) deliberately: this library
+    // is the part that can be pushed independently, and writing to a file avoids
+    // depending on where the pipeline's stdout ends up.
+    //
+    // The column that matters is `stale` = frames since this track last matched a
+    // real detection. 0 = updated from a detection this frame; > 0 = coasting on
+    // a Kalman prediction. update_unmatches() keeps a coasting track in the
+    // TRACKED list (and therefore published) for keep_tracked_frames, so a
+    // published row is NOT proof the object was detected.
+    //
+    // Reading a duplicate-id event: two rows, same frame, near-identical cx/cy,
+    // with `stale` alternating 0/1 between them is the A<->B limit cycle - both
+    // tracks alive, taking turns winning the one detection. One row whose
+    // track_id changes between frames is a different bug entirely.
+    // -----------------------------------------------------------------------
+    static FILE *track_log = []() -> FILE * {
+        const char *path = std::getenv("HAILO_TRACK_LOG");
+        if (path == nullptr)
+            return nullptr;
+        FILE *f = std::fopen(path, "w");
+        if (f != nullptr)
+            std::fprintf(f, "frame,n_tracks,track_id,class_id,state,stale,cx,cy,w,h,conf\n");
+        return f;
+    }();
+
+    if (track_log != nullptr)
+    {
+        for (uint i = 0; i < output_stracks.size(); i++)
+        {
+            STrack &t = output_stracks[i];
+            std::vector<float> xyah = t.to_xyah();
+            std::fprintf(track_log, "%d,%u,%d,%d,%d,%d,%.1f,%.1f,%.1f,%.1f,%.3f\n",
+                         this->m_frame_id,
+                         (uint)output_stracks.size(),
+                         t.m_track_id,
+                         t.m_class_id,
+                         t.get_state(),                        // 0=New 1=Tracked 2=Lost 3=Removed
+                         this->m_frame_id - t.end_frame(),     // stale: 0 = matched this frame
+                         xyah[0] * m_track_shmp->_model_input_size_x,
+                         xyah[1] * m_track_shmp->_model_input_size_y,
+                         xyah[2] * xyah[3] * m_track_shmp->_model_input_size_x,
+                         xyah[3] * m_track_shmp->_model_input_size_y,
+                         t.m_confidence);
+        }
+        std::fflush(track_log);
+    }
 
     //save ouput stracks to shm
     for (uint i = 0; i < output_stracks.size(); i++)
