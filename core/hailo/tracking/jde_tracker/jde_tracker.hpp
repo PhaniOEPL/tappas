@@ -51,11 +51,11 @@
 //
 // If std_weight_position is ever retuned, rescale these by (0.01 / new_value)^2
 // to hold the gate's physical width constant.
-#define DEFAULT_GATING_SCALE (25.0f)
+#define DEFAULT_GATING_SCALE (100.0f)
 // The extended-IOU pass (step 3.2) exists to recover large/fast motion, so a gate
 // sized for ordinary motion fights its purpose. 100 gives it ~2x the displacement
 // budget of the primary pass.
-#define EXTENDED_IOU_GATING_SCALE (100.0f)
+#define EXTENDED_IOU_GATING_SCALE (400.0f)
 // ---------------------------------------------------------------------------
 // Direction-consistency cost (OC-SORT style)
 // ---------------------------------------------------------------------------
