@@ -445,13 +445,12 @@ inline std::vector<STrack> JDETracker::update(std::vector<HailoDetectionPtr> &in
     m_track_shmp->_numTracks=output_stracks.size();
 
     // -----------------------------------------------------------------------
-    // Diagnostic track log - OPT-IN, off unless the env var is set.
+    // Diagnostic track log - ALWAYS ON, fixed path. No env var, no run-script
+    // change: the only thing that has to reach the device is this plugin.
     //
-    //     HAILO_TRACK_LOG=/tmp/tracks.csv <however the pipeline is launched>
-    //
-    // Written from the tracker (not the consumer app) deliberately: this library
-    // is the part that can be pushed independently, and writing to a file avoids
-    // depending on where the pipeline's stdout ends up.
+    // Written from the tracker rather than the consumer app because this library
+    // is the part that can be pushed independently, and a file avoids depending
+    // on where the pipeline's stdout ends up.
     //
     // The column that matters is `stale` = frames since this track last matched a
     // real detection. 0 = updated from a detection this frame; > 0 = coasting on
@@ -463,14 +462,22 @@ inline std::vector<STrack> JDETracker::update(std::vector<HailoDetectionPtr> &in
     // with `stale` alternating 0/1 between them is the A<->B limit cycle - both
     // tracks alive, taking turns winning the one detection. One row whose
     // track_id changes between frames is a different bug entirely.
+    //
+    // REMOVE BEFORE SHIPPING - this fflushes every frame at 60fps and the file
+    // grows a few tens of MB per hour.
     // -----------------------------------------------------------------------
+    #define HAILO_TRACK_LOG_PATH "/tmp/tracks.csv"
     static FILE *track_log = []() -> FILE * {
-        const char *path = std::getenv("HAILO_TRACK_LOG");
-        if (path == nullptr)
+        FILE *f = std::fopen(HAILO_TRACK_LOG_PATH, "w");
+        if (f == nullptr)
+        {
+            // Say so loudly. A silent no-op here is indistinguishable from "the
+            // tracker never ran", which is expensive to work out from the outside.
+            std::fprintf(stderr, "[hailotracker] could not open " HAILO_TRACK_LOG_PATH " for writing - track logging DISABLED\n");
             return nullptr;
-        FILE *f = std::fopen(path, "w");
-        if (f != nullptr)
-            std::fprintf(f, "frame,n_tracks,track_id,class_id,state,stale,cx,cy,w,h,conf\n");
+        }
+        std::fprintf(stderr, "[hailotracker] track logging -> " HAILO_TRACK_LOG_PATH "\n");
+        std::fprintf(f, "frame,n_tracks,track_id,class_id,state,stale,cx,cy,w,h,conf\n");
         return f;
     }();
 
